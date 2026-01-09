@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gurm-ni | Home</title>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container">
+				<h1 class="site-title">Gurm-ni</h1>
+				<nav class="site-nav">
+					<a href="#about">About</a>
+					<a href="#features">Features</a>
+					<a href="#contact">Contact</a>
+				</nav>
+			</div>
+		</header>
+
+		<main>
+			<section class="hero" id="top">
+				<div class="container">
+					<h2>Welcome to Gurm-ni</h2>
+					<p>
+						This is the main page of your project. Use it to briefly introduce
+						what Gurm-ni is about and guide visitors to the most important
+						sections.
+					</p>
+					<a class="btn-primary" href="#features">Explore features</a>
+				</div>
+			</section>
+
+			<section class="section" id="about">
+				<div class="container">
+					<h3>About</h3>
+					<p>
+						Add a short description of the project, its purpose, and who it is
+						for. You can expand this section later with more details or images.
+					</p>
+				</div>
+			</section>
+
+			<section class="section" id="features">
+				<div class="container">
+					<h3>Features</h3>
+					<ul>
+						<li>Clear project overview on the homepage.</li>
+						<li>Sections for about, features, and contact.</li>
+						<li>Simple layout that you can easily customize.</li>
+					</ul>
+				</div>
+			</section>
+
+			<section class="section" id="contact">
+				<div class="container">
+					<h3>Contact</h3>
+					<p>
+						Provide contact details or a link to your preferred communication
+						channel here.
+					</p>
+				</div>
+			</section>
+		</main>
+
+		<footer class="site-footer">
+			<div class="container">
+				<p>&copy; <span id="year"></span> Gurm-ni. All rights reserved.</p>
+			</div>
+		</footer>
+
+		<script>
+			document.getElementById("year").textContent = new Date().getFullYear();
+		</script>
+	</body>
+</html>
+
