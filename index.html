@@ -1,71 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Gurm-ni | Home</title>
+		<title>Gurm-ni | Úvod</title>
 		<link rel="stylesheet" href="styles.css" />
 	</head>
 	<body>
 		<header class="site-header">
-			<div class="container">
+			<div class="container header-inner">
 				<h1 class="site-title">Gurm-ni</h1>
-				<nav class="site-nav">
-					<a href="#about">About</a>
-					<a href="#features">Features</a>
-					<a href="#contact">Contact</a>
-				</nav>
 			</div>
 		</header>
 
-		<main>
-			<section class="hero" id="top">
+		<main class="home-page" aria-labelledby="home-heading">
+			<section class="home-hero">
 				<div class="container">
-					<h2>Welcome to Gurm-ni</h2>
-					<p>
-						This is the main page of your project. Use it to briefly introduce
-						what Gurm-ni is about and guide visitors to the most important
-						sections.
-					</p>
-					<a class="btn-primary" href="#features">Explore features</a>
-				</div>
-			</section>
-
-			<section class="section" id="about">
-				<div class="container">
-					<h3>About</h3>
-					<p>
-						Add a short description of the project, its purpose, and who it is
-						for. You can expand this section later with more details or images.
+					<h2 id="home-heading">Vyber si, s čím chceš pracovat</h2>
+					<p class="home-subtitle">
+						Toto je úvodní stránka. Uživatel jen vidí čtyři velké bloky a
+						kliknutím si otevře podrobnější stránku s funkcemi.
 					</p>
 				</div>
 			</section>
 
-			<section class="section" id="features">
+			<section class="home-section">
 				<div class="container">
-					<h3>Features</h3>
-					<ul>
-						<li>Clear project overview on the homepage.</li>
-						<li>Sections for about, features, and contact.</li>
-						<li>Simple layout that you can easily customize.</li>
-					</ul>
-				</div>
-			</section>
+					<div class="home-grid">
+						<a href="recepty.html" class="home-card">
+							<h3 class="home-card-title">Recepty</h3>
+							<p class="home-card-description">
+								Přehled všech receptů. Později zde může být vyhledávání,
+								filtrování a detail každého receptu.
+							</p>
+						</a>
 
-			<section class="section" id="contact">
-				<div class="container">
-					<h3>Contact</h3>
-					<p>
-						Provide contact details or a link to your preferred communication
-						channel here.
-					</p>
+						<a href="potraviny.html" class="home-card">
+							<h3 class="home-card-title">Potraviny</h3>
+							<p class="home-card-description">
+								Místo pro seznam surovin, trvanlivost a stav zásob ve
+								spižírně.
+							</p>
+						</a>
+
+						<a href="nakupni-seznam.html" class="home-card">
+							<h3 class="home-card-title">Nákupní seznam</h3>
+							<p class="home-card-description">
+								Jednoduchý přehled, co je potřeba dokoupit. Může být propojený
+								srecepty a potravinami.
+							</p>
+						</a>
+
+						<a href="pridat-recept.html" class="home-card">
+							<h3 class="home-card-title">Přidat recept</h3>
+							<p class="home-card-description">
+								Stránka pro přidání vlastního receptu – název, suroviny, postup
+								a další poznámky.
+							</p>
+						</a>
+					</div>
 				</div>
 			</section>
 		</main>
 
 		<footer class="site-footer">
 			<div class="container">
-				<p>&copy; <span id="year"></span> Gurm-ni. All rights reserved.</p>
+				<p>&copy; <span id="year"></span> Gurm-ni</p>
 			</div>
 		</footer>
 

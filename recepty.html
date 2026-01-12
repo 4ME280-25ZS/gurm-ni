@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gurm-ni | Recepty</title>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container header-inner">
+				<h1 class="site-title">Gurm-ni</h1>
+				<a href="index.html" class="header-link">← Zpět na úvod</a>
+			</div>
+		</header>
+
+		<main class="recepty-page" aria-labelledby="recepty-heading">
+			<section class="recepty-hero">
+				<div class="container">
+					<h2 id="recepty-heading">Recepty</h2>
+					<p class="recepty-subtitle">
+						Databáze receptů z internetu i těch, které si sám přidáš.
+						Níže si můžeš recepty filtrovat a hledat.
+					</p>
+					<form class="recepty-toolbar" aria-label="Filtrování receptů" onsubmit="return false;">
+						<label class="toolbar-search">
+							<span class="field-label">Hledat</span>
+							<input
+								type="search"
+								id="searchInput"
+								placeholder="Např. špagety, polévka, kuře..."
+							/>
+						</label>
+
+						<div class="toolbar-filters">
+							<label class="filter-pill">
+								<input type="checkbox" id="filterHaveIngredients" />
+								<span>Jen potraviny, které mám</span>
+							</label>
+							<label class="filter-pill">
+								<input type="checkbox" id="filterMyRecipes" />
+								<span>Moje recepty</span>
+							</label>
+						</div>
+					</form>
+				</div>
+			</section>
+
+			<section class="recepty-section">
+				<div class="container">
+					<div id="recipesContainer" class="recepty-grid" aria-live="polite"></div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="site-footer">
+			<div class="container">
+				<p>&copy; <span id="year"></span> Gurm-ni</p>
+			</div>
+		</footer>
+
+		<script>
+			const POTRAVINY_STORAGE_KEY = "gurmni_potraviny";
+			const USER_RECIPES_STORAGE_KEY = "gurmni_user_recepty";
+			const baseRecipes = [
+				{
+					id: 1,
+					title: "Špagety aglio e olio",
+					description:
+						"Rychlé italské těstoviny s česnekem, olivovým olejem a chilli.",
+					ingredients: ["špagety", "česnek", "olivový olej", "chilli", "sůl"],
+					time: "15 min",
+					difficulty: "Lehká",
+					portions: 2,
+					isUserRecipe: false,
+				},
+				{
+					id: 2,
+					title: "Krémová dýňová polévka",
+					description:
+						"Jemná polévka z pečené dýně s kokosovým mlékem a zázvorem.",
+					ingredients: ["dýně", "cibule", "česnek", "vývar", "kokosové mléko"],
+					time: "30 min",
+					difficulty: "Střední",
+					portions: 4,
+					isUserRecipe: false,
+				},
+				{
+					id: 3,
+					title: "Banánové lívance",
+					description:
+						"Nadýchané lívance z banánu, vloček a vajec – skvělá snídaně.",
+					ingredients: ["banán", "ovesné vločky", "vejce", "olej"],
+					time: "20 min",
+					difficulty: "Lehká",
+					portions: 2,
+					isUserRecipe: false,
+				},
+				{
+					id: 4,
+					title: "Kuřecí stir-fry se zeleninou",
+					description:
+						"Rychlá pánev s kuřecím masem, zeleninou a sojovou omáčkou.",
+					ingredients: ["kuřecí prsa", "paprika", "mrkev", "sojová omáčka", "rýže"],
+					time: "25 min",
+					difficulty: "Střední",
+					portions: 3,
+					isUserRecipe: false,
+				},
+			];
+
+			const yearEl = document.getElementById("year");
+			if (yearEl) {
+				yearEl.textContent = new Date().getFullYear();
+			}
+
+			const searchInput = document.getElementById("searchInput");
+			const filterHaveIngredients = document.getElementById("filterHaveIngredients");
+			const filterMyRecipes = document.getElementById("filterMyRecipes");
+			const container = document.getElementById("recipesContainer");
+
+			function loadUserRecipes() {
+				try {
+					const raw = localStorage.getItem(USER_RECIPES_STORAGE_KEY);
+					if (!raw) return [];
+					const parsed = JSON.parse(raw);
+					if (!Array.isArray(parsed)) return [];
+					return parsed.map((r) => ({
+						id: r.id || Date.now(),
+						title: r.title || "Bez názvu",
+						description: r.description || "Uživatelský recept.",
+						ingredients: Array.isArray(r.ingredients) ? r.ingredients : [],
+						time: r.time || "",
+						difficulty: r.difficulty || "Moje",
+						portions: r.portions || 0,
+						isUserRecipe: true,
+					}));
+				} catch (e) {
+					return [];
+				}
+			}
+
+			function getAllRecipes() {
+				const userRecipes = loadUserRecipes();
+				return [...baseRecipes, ...userRecipes];
+			}
+
+			function getMyIngredients() {
+				try {
+					const raw = localStorage.getItem(POTRAVINY_STORAGE_KEY);
+					if (!raw) return [];
+					const parsed = JSON.parse(raw);
+					if (!Array.isArray(parsed)) return [];
+					return parsed
+						.map((item) => (item && item.name ? String(item.name).toLowerCase() : ""))
+						.filter(Boolean);
+				} catch (e) {
+					return [];
+				}
+			}
+
+			function hasOnlyMyIngredients(recipe) {
+				const mine = getMyIngredients();
+				if (!mine.length) return false;
+				return recipe.ingredients.every((ing) => mine.includes(ing.toLowerCase()));
+			}
+
+			function renderRecipes(list) {
+				if (!container) return;
+				if (!list.length) {
+					container.innerHTML = '<p class="recepty-empty">Žádné recepty neodpovídají filtru.</p>';
+					return;
+				}
+
+				container.innerHTML = list
+					.map((r) => {
+						const tags = [r.difficulty, `${r.time}`, `${r.portions} porce`]
+							.map((t) => `<span class="tag">${t}</span>`)
+							.join("");
+						const sourceTag = r.isUserRecipe
+							? '<span class="tag tag-user">Moje recepty</span>'
+							: '<span class="tag tag-web">Internet</span>';
+
+						return `
+							<article class="recept-card">
+								<header class="recept-card-header">
+									<h3>${r.title}</h3>
+									<p class="recept-meta">${r.time} • ${r.difficulty} • ${r.portions} porce</p>
+								</header>
+								<p class="recept-description">${r.description}</p>
+								<div class="recept-tags">${tags} ${sourceTag}</div>
+								<p class="recept-ingredients">Suroviny: ${r.ingredients.join(", ")}</p>
+							</article>
+						`;
+					})
+					.join("");
+			}
+
+			function applyFilters() {
+				const query = (searchInput?.value || "").toLowerCase().trim();
+				const onlyHave = !!filterHaveIngredients?.checked;
+				const onlyMine = !!filterMyRecipes?.checked;
+				const all = getAllRecipes();
+
+				let result = all.filter((r) => {
+					const inSearch = !query
+						? true
+						: r.title.toLowerCase().includes(query) ||
+						  r.description.toLowerCase().includes(query);
+
+					if (!inSearch) return false;
+
+					if (onlyHave && !hasOnlyMyIngredients(r)) return false;
+					if (onlyMine && !r.isUserRecipe) return false;
+
+					return true;
+				});
+
+				renderRecipes(result);
+			}
+
+			searchInput?.addEventListener("input", applyFilters);
+			filterHaveIngredients?.addEventListener("change", applyFilters);
+			filterMyRecipes?.addEventListener("change", applyFilters);
+
+			applyFilters();
+		</script>
+	</body>
+</html>

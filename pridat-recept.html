@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gurm-ni | Přidat recept</title>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container header-inner">
+				<h1 class="site-title">Gurm-ni</h1>
+				<a href="index.html" class="header-link">← Zpět na úvod</a>
+			</div>
+		</header>
+
+		<main class="pridat-page" aria-labelledby="pridat-heading">
+			<section class="pridat-hero">
+				<div class="container">
+					<h2 id="pridat-heading">Přidat recept</h2>
+					<p class="pridat-subtitle">
+						Nejprve klikni na tlačítko níže a poté vyplň název receptu,
+						suroviny, dobu vaření a jednotlivé kroky.
+					</p>
+					<button type="button" id="showFormButton" class="add-recipe-button">
+						+ Přidat nový recept
+					</button>
+				</div>
+			</section>
+
+			<section class="pridat-section">
+				<div class="container">
+					<form id="recipeForm" class="pridat-form hidden" autocomplete="off">
+						<div class="pridat-form-grid">
+							<label class="field">
+								<span class="field-label">Název receptu</span>
+								<input type="text" id="recipeName" required />
+							</label>
+
+							<label class="field">
+								<span class="field-label">Suroviny</span>
+								<div class="ingredients-input-row">
+									<input
+										type="text"
+										id="recipeIngredientInput"
+										list="ingredientSuggestions"
+										placeholder="Začni psát název suroviny a vyber z nabídky"
+									/>
+									<button type="button" id="addIngredientButton" class="btn-ghost">
+										+ Přidat surovinu
+									</button>
+								</div>
+								<ul
+									id="selectedIngredients"
+									class="potraviny-list pridat-ingredients-list"
+									aria-live="polite"
+								></ul>
+							</label>
+
+							<label class="field">
+								<span class="field-label">Doba vaření</span>
+								<input
+									type="text"
+									id="recipeTime"
+									placeholder="Např. 20 min"
+									required
+								/>
+							</label>
+						</div>
+
+						<div class="pridat-steps">
+							<div class="pridat-steps-header">
+								<h3>Kroky receptu</h3>
+								<button type="button" id="addStepButton" class="btn-ghost">
+									+ Přidat krok
+								</button>
+							</div>
+							<ol id="stepsList" class="steps-list"></ol>
+						</div>
+
+						<div class="pridat-actions">
+							<button type="submit" class="btn-primary">Uložit recept (lokálně)</button>
+							<p id="saveMessage" class="pridat-message" aria-live="polite"></p>
+						</div>
+					</form>
+				</div>
+			</section>
+		</main>
+
+		<datalist id="ingredientSuggestions">
+			<option value="špagety"></option>
+			<option value="těstoviny"></option>
+			<option value="rýže"></option>
+			<option value="bulgur"></option>
+			<option value="kuskus"></option>
+			<option value="quinoa"></option>
+			<option value="brambory"></option>
+			<option value="chléb"></option>
+			<option value="pečivo"></option>
+			<option value="tortilla"></option>
+			<option value="česnek"></option>
+			<option value="cibule"></option>
+			<option value="jarní cibulka"></option>
+			<option value="pórek"></option>
+			<option value="mrkev"></option>
+			<option value="celer"></option>
+			<option value="petržel (kořen)"></option>
+			<option value="petrželová nať"></option>
+			<option value="paprika"></option>
+			<option value="červená paprika"></option>
+			<option value="žlutá paprika"></option>
+			<option value="zelená paprika"></option>
+			<option value="rajčata"></option>
+			<option value=" cherry rajčata"></option>
+			<option value="okurka"></option>
+			<option value="okurka salátová"></option>
+			<option value="salát (hlávkový)"></option>
+			<option value="rukola"></option>
+			<option value="špenát"></option>
+			<option value="brokolice"></option>
+			<option value="květák"></option>
+			<option value="cuketa"></option>
+			<option value="lilek"></option>
+			<option value="kukuřice"></option>
+			<option value="hrášek"></option>
+			<option value="fazolky"></option>
+			<option value="červená čočka"></option>
+			<option value="zelená čočka"></option>
+			<option value="cizrna"></option>
+			<option value="fazole bílé"></option>
+			<option value="fazole červené"></option>
+			<option value="fazole černé"></option>
+			<option value="jogurt"></option>
+			<option value="bílý jogurt"></option>
+			<option value="řecký jogurt"></option>
+			<option value="tvaroh"></option>
+			<option value="mléko"></option>
+			<option value="smetana na vaření"></option>
+			<option value="smetana ke šlehání"></option>
+			<option value="máslo"></option>
+			<option value="ghí"></option>
+			<option value="sýr eidam"></option>
+			<option value="sýr čedar"></option>
+			<option value="sýr mozzarella"></option>
+			<option value="parmazán"></option>
+			<option value="niva"></option>
+			<option value="vejce"></option>
+			<option value="šunka"></option>
+			<option value="slanina"></option>
+			<option value="anglická slanina"></option>
+			<option value="kuřecí prsa"></option>
+			<option value="kuřecí stehna"></option>
+			<option value="mleté hovězí"></option>
+			<option value="mleté vepřové"></option>
+			<option value="vepřová panenka"></option>
+			<option value="hovězí maso"></option>
+			<option value="ryba (losos)"></option>
+			<option value="ryba (treska)"></option>
+			<option value="tuňák v konzervě"></option>
+			<option value="banán"></option>
+			<option value="jablko"></option>
+			<option value="hruška"></option>
+			<option value="pomeranč"></option>
+			<option value="mandarinka"></option>
+			<option value="citron"></option>
+			<option value="limetka"></option>
+			<option value="jahody"></option>
+			<option value="maliny"></option>
+			<option value="borůvky"></option>
+			<option value="ananas"></option>
+			<option value="mango"></option>
+			<option value="hroznové víno"></option>
+			<option value="ovesné vločky"></option>
+			<option value="müsli"></option>
+			<option value="kukuřičné lupínky"></option>
+			<option value="hladká mouka"></option>
+			<option value="polohrubá mouka"></option>
+			<option value="hrubá mouka"></option>
+			<option value="celozrnná mouka"></option>
+			<option value="cukr krupice"></option>
+			<option value="cukr moučka"></option>
+			<option value="hnědý cukr"></option>
+			<option value="med"></option>
+			<option value="javorový sirup"></option>
+			<option value="čokoláda na vaření"></option>
+			<option value="kakao"></option>
+			<option value="prášek do pečiva"></option>
+			<option value="soda na pečení"></option>
+			<option value="droždí sušené"></option>
+			<option value="droždí čerstvé"></option>
+			<option value="olej"></option>
+			<option value="olivový olej"></option>
+			<option value="řepkový olej"></option>
+			<option value="slunečnicový olej"></option>
+			<option value="sojová omáčka"></option>
+			<option value="balzamikový ocet"></option>
+			<option value="jablečný ocet"></option>
+			<option value="sůl"></option>
+			<option value="pepř"></option>
+			<option value="paprika sladká"></option>
+			<option value="paprika pálivá"></option>
+			<option value="kari koření"></option>
+			<option value="kmín"></option>
+			<option value="majoránka"></option>
+			<option value="bazalka"></option>
+			<option value="oregano"></option>
+			<option value="tymián"></option>
+			<option value="rozmarýn"></option>
+			<option value="bobkový list"></option>
+			<option value="černý čaj"></option>
+			<option value="zelený čaj"></option>
+			<option value="káva mletá"></option>
+			<option value="káva instantní"></option>
+			<option value="minerálka"></option>
+			<option value="džus pomerančový"></option>
+			<option value="džus jablečný"></option>
+		</datalist>
+
+		<footer class="site-footer">
+			<div class="container">
+				<p>&copy; <span id="year"></span> Gurm-ni</p>
+			</div>
+		</footer>
+
+		<script>
+			const RECIPES_STORAGE_KEY = "gurmni_user_recepty";
+
+			const yearEl = document.getElementById("year");
+			if (yearEl) {
+				yearEl.textContent = new Date().getFullYear();
+			}
+
+			const showFormButton = document.getElementById("showFormButton");
+			const form = document.getElementById("recipeForm");
+			const nameInput = document.getElementById("recipeName");
+			const ingredientInput = document.getElementById("recipeIngredientInput");
+			const addIngredientButton = document.getElementById("addIngredientButton");
+			const selectedIngredientsEl = document.getElementById("selectedIngredients");
+			const timeInput = document.getElementById("recipeTime");
+			const stepsList = document.getElementById("stepsList");
+			const addStepButton = document.getElementById("addStepButton");
+			const saveMessage = document.getElementById("saveMessage");
+			let currentIngredients = [];
+
+			function loadUserRecipes() {
+				try {
+					const raw = localStorage.getItem(RECIPES_STORAGE_KEY);
+					if (!raw) return [];
+					const parsed = JSON.parse(raw);
+					return Array.isArray(parsed) ? parsed : [];
+				} catch (e) {
+					return [];
+				}
+			}
+
+			function saveUserRecipes(list) {
+				localStorage.setItem(RECIPES_STORAGE_KEY, JSON.stringify(list));
+			}
+
+			function renderIngredientChips() {
+				if (!selectedIngredientsEl) return;
+				if (!currentIngredients.length) {
+					selectedIngredientsEl.innerHTML =
+						'<li class="potraviny-empty">Zatím nejsou přidané žádné suroviny.</li>';
+					return;
+				}
+
+				selectedIngredientsEl.innerHTML = currentIngredients
+					.map(
+						(name, index) => `
+							<li class="potraviny-item pridat-ingredient-item" data-index="${index}">
+								<div class="potraviny-item-main">
+									<span class="potraviny-item-name">${name}</span>
+								</div>
+								<button type="button" class="btn-ghost pridat-ingredient-remove">Odstranit</button>
+							</li>
+						`
+					)
+					.join("");
+			}
+
+			function addIngredientFromInput() {
+				if (!ingredientInput) return;
+				const value = ingredientInput.value.trim();
+				if (!value) return;
+				const lower = value.toLowerCase();
+				if (!currentIngredients.map((v) => v.toLowerCase()).includes(lower)) {
+					currentIngredients.push(value);
+				}
+				ingredientInput.value = "";
+				ingredientInput.focus();
+				renderIngredientChips();
+			}
+
+			function addStepField(initialValue = "") {
+				const li = document.createElement("li");
+				li.className = "step-item";
+				const input = document.createElement("input");
+				input.type = "text";
+				input.className = "step-input";
+				input.value = initialValue;
+				input.placeholder = "Popiš krok, např. 'Nakrájej cibuli na jemno'";
+				li.appendChild(input);
+				stepsList.appendChild(li);
+			}
+
+			showFormButton?.addEventListener("click", () => {
+				form?.classList.remove("hidden");
+				if (!stepsList.childElementCount) {
+					addStepField();
+				}
+				nameInput?.focus();
+			});
+
+			addStepButton?.addEventListener("click", () => {
+				addStepField();
+			});
+
+			addIngredientButton?.addEventListener("click", () => {
+				addIngredientFromInput();
+			});
+
+			ingredientInput?.addEventListener("keydown", (event) => {
+				if (event.key === "Enter") {
+					event.preventDefault();
+					addIngredientFromInput();
+				}
+			});
+
+			selectedIngredientsEl?.addEventListener("click", (event) => {
+				const target = event.target;
+				if (!(target instanceof HTMLElement)) return;
+				if (!target.classList.contains("pridat-ingredient-remove")) return;
+				const li = target.closest(".pridat-ingredient-item");
+				if (!li) return;
+				const indexAttr = li.getAttribute("data-index");
+				if (indexAttr == null) return;
+				const index = Number(indexAttr);
+				if (Number.isNaN(index)) return;
+				currentIngredients.splice(index, 1);
+				renderIngredientChips();
+			});
+
+			form?.addEventListener("submit", (event) => {
+				event.preventDefault();
+				const name = nameInput.value.trim();
+				const time = timeInput.value.trim();
+				const ingredientsLines = currentIngredients.slice();
+
+				const steps = Array.from(stepsList.querySelectorAll(".step-input"))
+					.map((el) => el.value.trim())
+					.filter(Boolean);
+
+				if (!name || !time || !ingredientsLines.length || !steps.length) {
+					if (saveMessage) {
+						saveMessage.textContent = "Vyplň prosím všechny povinné části receptu.";
+					}
+					return;
+				}
+
+				const list = loadUserRecipes();
+				list.push({
+					id: Date.now(),
+					title: name,
+					ingredients: ingredientsLines,
+					time,
+					steps,
+					isUserRecipe: true,
+				});
+				saveUserRecipes(list);
+
+				form.reset();
+				stepsList.innerHTML = "";
+				addStepField();
+				currentIngredients = [];
+				renderIngredientChips();
+
+				if (saveMessage) {
+					saveMessage.textContent = "Recept byl uložen (zatím jen v tomto prohlížeči).";
+				}
+			});
+
+			// Start with one empty step so uživatel vidí strukturu
+			addStepField();
+			renderIngredientChips();
+		</script>
+	</body>
+</html>

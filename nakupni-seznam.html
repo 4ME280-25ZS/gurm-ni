@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gurm-ni | Nákupní seznam</title>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container header-inner">
+				<h1 class="site-title">Gurm-ni</h1>
+				<a href="index.html" class="header-link">← Zpět na úvod</a>
+			</div>
+		</header>
+
+		<main class="nakup-page" aria-labelledby="nakup-heading">
+			<section class="nakup-hero">
+				<div class="container">
+					<h2 id="nakup-heading">Nákupní seznam</h2>
+					<p class="nakup-subtitle">
+						Vyber recepty, které chceš vařit. Nákupní seznam ti ukáže
+						<strong>jen ty suroviny, které nemáš</strong> v seznamu Potraviny.
+					</p>
+				</div>
+			</section>
+
+			<section class="nakup-section">
+				<div class="container nakup-layout">
+					<div class="nakup-recipes">
+						<h3>Recepty</h3>
+						<p class="nakup-hint">
+							Zaškrtni jeden nebo více receptů. Seznam surovin se automaticky
+							aktualizuje.
+						</p>
+						<ul id="nakupRecipesList" class="nakup-recipes-list"></ul>
+					</div>
+
+					<div class="nakup-needed">
+						<h3>Co je potřeba dokoupit</h3>
+						<p class="nakup-hint">
+							Porovnává vybrané recepty se seznamem Potraviny. Položky, které už
+							máš doma, se sem nezobrazí.
+						</p>
+						<ul id="nakupNeededList" class="nakup-needed-list" aria-live="polite"></ul>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="site-footer">
+			<div class="container">
+				<p>&copy; <span id="year"></span> Gurm-ni</p>
+			</div>
+		</footer>
+
+		<script>
+			const NAKUP_POTRAVINY_KEY = "gurmni_potraviny";
+			const USER_RECIPES_KEY = "gurmni_user_recepty";
+			const baseRecipes = [
+				{
+					id: 1,
+					title: "Špagety aglio e olio",
+					ingredients: ["špagety", "česnek", "olivový olej", "chilli", "sůl"],
+				},
+				{
+					id: 2,
+					title: "Krémová dýňová polévka",
+					ingredients: ["dýně", "cibule", "česnek", "vývar", "kokosové mléko"],
+				},
+				{
+					id: 3,
+					title: "Banánové lívance",
+					ingredients: ["banán", "ovesné vločky", "vejce", "olej"],
+				},
+				{
+					id: 4,
+					title: "Kuřecí stir-fry se zeleninou",
+					ingredients: [
+						"kuřecí prsa",
+						"paprika",
+						"mrkev",
+						"sojová omáčka",
+						"rýže",
+					],
+				},
+			];
+
+			const yearEl = document.getElementById("year");
+			if (yearEl) {
+				yearEl.textContent = new Date().getFullYear();
+			}
+
+			const recipesListEl = document.getElementById("nakupRecipesList");
+			const neededListEl = document.getElementById("nakupNeededList");
+
+			function getMyIngredientsLower() {
+				try {
+					const raw = localStorage.getItem(NAKUP_POTRAVINY_KEY);
+					if (!raw) return [];
+					const parsed = JSON.parse(raw);
+					if (!Array.isArray(parsed)) return [];
+					return parsed
+						.map((item) => (item && item.name ? String(item.name).toLowerCase() : ""))
+						.filter(Boolean);
+				} catch (e) {
+					return [];
+				}
+			}
+
+			function loadUserRecipes() {
+				try {
+					const raw = localStorage.getItem(USER_RECIPES_KEY);
+					if (!raw) return [];
+					const parsed = JSON.parse(raw);
+					if (!Array.isArray(parsed)) return [];
+					return parsed.map((r) => ({
+						id: r.id || Date.now(),
+						title: r.title || "Bez názvu",
+						ingredients: Array.isArray(r.ingredients) ? r.ingredients : [],
+						isUserRecipe: true,
+					}));
+				} catch (e) {
+					return [];
+				}
+			}
+
+			function getAllRecipes() {
+				const userRecipes = loadUserRecipes();
+				return [...baseRecipes, ...userRecipes];
+			}
+
+			function renderRecipesChoices() {
+				const all = getAllRecipes();
+				if (!all.length) {
+					recipesListEl.innerHTML =
+						'<li class="nakup-empty">Zatím nejsou k dispozici žádné recepty.</li>';
+					return;
+				}
+
+				recipesListEl.innerHTML = all
+					.map(
+						(r) => `
+							<li class="nakup-recipe-item">
+								<label>
+									<input type="checkbox" class="nakup-recipe-checkbox" value="${r.id}" />
+									<span>${r.title}${
+										r.isUserRecipe ? " (můj recept)" : ""
+									}</span>
+								</label>
+							</li>
+						`
+					)
+					.join("");
+			}
+
+			function updateNeededList() {
+				const myIngredients = getMyIngredientsLower();
+				const checkboxes = document.querySelectorAll(".nakup-recipe-checkbox");
+				const selectedIds = Array.from(checkboxes)
+					.filter((cb) => cb.checked)
+					.map((cb) => Number(cb.value));
+
+				if (!selectedIds.length) {
+					neededListEl.innerHTML =
+						'<li class="nakup-empty">Zatím nejsou vybrané žádné recepty.</li>';
+					return;
+				}
+
+				const all = getAllRecipes();
+				const neededSet = new Set();
+				for (const r of all) {
+					if (!selectedIds.includes(r.id)) continue;
+					for (const ing of r.ingredients) {
+						neededSet.add(ing.toLowerCase());
+					}
+				}
+
+				const needed = Array.from(neededSet).filter(
+					(ing) => !myIngredients.includes(ing)
+				);
+
+				if (!needed.length) {
+					neededListEl.innerHTML =
+						'<li class="nakup-empty">Na vybrané recepty máš všechny suroviny.</li>';
+					return;
+				}
+
+				neededListEl.innerHTML = needed
+					.sort((a, b) => a.localeCompare(b, "cs"))
+					.map((ing) => `<li class="nakup-needed-item">${ing}</li>`)
+					.join("");
+			}
+
+			recipesListEl?.addEventListener("change", (event) => {
+				if (!(event.target instanceof HTMLInputElement)) return;
+				if (!event.target.classList.contains("nakup-recipe-checkbox")) return;
+				updateNeededList();
+			});
+
+			// Initial render
+			renderRecipesChoices();
+			updateNeededList();
+		</script>
+	</body>
+</html>

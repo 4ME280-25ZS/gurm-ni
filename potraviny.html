@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gurm-ni | Potraviny</title>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container header-inner">
+				<h1 class="site-title">Gurm-ni</h1>
+				<a href="index.html" class="header-link">← Zpět na úvod</a>
+			</div>
+		</header>
+
+		<main class="potraviny-page" aria-labelledby="potraviny-heading">
+			<section class="potraviny-hero">
+				<div class="container">
+					<h2 id="potraviny-heading">Potraviny</h2>
+					<p class="potraviny-subtitle">
+						Seznam surovin, které máš doma. Tento seznam se ukládá jen do
+						<strong>localStorage</strong> v prohlížeči. Později ho může nahradit
+						Supabase databáze pro přihlášeného uživatele.
+					</p>
+				</div>
+			</section>
+
+			<section class="potraviny-section">
+				<div class="container">
+					<form id="ingredientForm" class="potraviny-form" autocomplete="off">
+						<div class="potraviny-form-row">
+							<label class="field">
+								<span class="field-label">Název suroviny</span>
+								<input
+									type="text"
+									id="ingredientName"
+									list="ingredientSuggestions"
+									placeholder="Např. špagety, banán, kuřecí prsa..."
+									required
+								/>
+							</label>
+							<label class="field">
+								<span class="field-label">Poznámka (nepovinné)</span>
+								<input
+									type="text"
+									id="ingredientNote"
+									placeholder="Např. celozrnné, otevřené, v mrazáku..."
+								/>
+							</label>
+							<button type="submit" class="btn-primary">Přidat</button>
+						</div>
+					</form>
+
+					<div class="potraviny-list-wrapper">
+						<h3>Moje suroviny</h3>
+						<p class="potraviny-hint">
+							Tento seznam používá filtr <strong>"Jen potraviny, které mám"</strong>
+							na stránce Recepty.
+						</p>
+						<ul id="ingredientsList" class="potraviny-list" aria-live="polite"></ul>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<datalist id="ingredientSuggestions">
+			<option value="špagety"></option>
+			<option value="těstoviny"></option>
+			<option value="rýže"></option>
+			<option value="bulgur"></option>
+			<option value="kuskus"></option>
+			<option value="quinoa"></option>
+			<option value="brambory"></option>
+			<option value="chléb"></option>
+			<option value="pečivo"></option>
+			<option value="tortilla"></option>
+			<option value="česnek"></option>
+			<option value="cibule"></option>
+			<option value="jarní cibulka"></option>
+			<option value="pórek"></option>
+			<option value="mrkev"></option>
+			<option value="celer"></option>
+			<option value="petržel (kořen)"></option>
+			<option value="petrželová nať"></option>
+			<option value="paprika"></option>
+			<option value="červená paprika"></option>
+			<option value="žlutá paprika"></option>
+			<option value="zelená paprika"></option>
+			<option value="rajčata"></option>
+			<option value=" cherry rajčata"></option>
+			<option value="okurka"></option>
+			<option value="okurka salátová"></option>
+			<option value="salát (hlávkový)"></option>
+			<option value="rukola"></option>
+			<option value="špenát"></option>
+			<option value="brokolice"></option>
+			<option value="květák"></option>
+			<option value="cuketa"></option>
+			<option value="lilek"></option>
+			<option value="kukuřice"></option>
+			<option value="hrášek"></option>
+			<option value="fazolky"></option>
+			<option value="červená čočka"></option>
+			<option value="zelená čočka"></option>
+			<option value="cizrna"></option>
+			<option value="fazole bílé"></option>
+			<option value="fazole červené"></option>
+			<option value="fazole černé"></option>
+			<option value="jogurt"></option>
+			<option value="bílý jogurt"></option>
+			<option value="řecký jogurt"></option>
+			<option value="tvaroh"></option>
+			<option value="mléko"></option>
+			<option value="smetana na vaření"></option>
+			<option value="smetana ke šlehání"></option>
+			<option value="máslo"></option>
+			<option value="ghí"></option>
+			<option value="sýr eidam"></option>
+			<option value="sýr čedar"></option>
+			<option value="sýr mozzarella"></option>
+			<option value="parmazán"></option>
+			<option value="niva"></option>
+			<option value="vejce"></option>
+			<option value="šunka"></option>
+			<option value="slanina"></option>
+			<option value="anglická slanina"></option>
+			<option value="kuřecí prsa"></option>
+			<option value="kuřecí stehna"></option>
+			<option value="mleté hovězí"></option>
+			<option value="mleté vepřové"></option>
+			<option value="vepřová panenka"></option>
+			<option value="hovězí maso"></option>
+			<option value="ryba (losos)"></option>
+			<option value="ryba (treska)"></option>
+			<option value="tuňák v konzervě"></option>
+			<option value="vejce"></option>
+			<option value="banán"></option>
+			<option value="jablko"></option>
+			<option value="hruška"></option>
+			<option value="pomeranč"></option>
+			<option value="mandarinka"></option>
+			<option value="citron"></option>
+			<option value="limetka"></option>
+			<option value="jahody"></option>
+			<option value="maliny"></option>
+			<option value="borůvky"></option>
+			<option value="ananas"></option>
+			<option value="mango"></option>
+			<option value="hroznové víno"></option>
+			<option value="ovesné vločky"></option>
+			<option value="müsli"></option>
+			<option value="kukuřičné lupínky"></option>
+			<option value="hladká mouka"></option>
+			<option value="polohrubá mouka"></option>
+			<option value="hrubá mouka"></option>
+			<option value="celozrnná mouka"></option>
+			<option value="cukr krupice"></option>
+			<option value="cukr moučka"></option>
+			<option value="hnědý cukr"></option>
+			<option value="med"></option>
+			<option value="javorový sirup"></option>
+			<option value="čokoláda na vaření"></option>
+			<option value="kakao"></option>
+			<option value="prášek do pečiva"></option>
+			<option value="soda na pečení"></option>
+			<option value="droždí sušené"></option>
+			<option value="droždí čerstvé"></option>
+			<option value="olej"></option>
+			<option value="olivový olej"></option>
+			<option value="řepkový olej"></option>
+			<option value="slunečnicový olej"></option>
+			<option value="sojová omáčka"></option>
+			<option value="balzamikový ocet"></option>
+			<option value="jablečný ocet"></option>
+			<option value="sůl"></option>
+			<option value="pepř"></option>
+			<option value="paprika sladká"></option>
+			<option value="paprika pálivá"></option>
+			<option value="kari koření"></option>
+			<option value="kmín"></option>
+			<option value="majoránka"></option>
+			<option value="bazalka"></option>
+			<option value="oregano"></option>
+			<option value="tymián"></option>
+			<option value="rozmarýn"></option>
+			<option value="bobkový list"></option>
+			<option value="černý čaj"></option>
+			<option value="zelený čaj"></option>
+			<option value="káva mletá"></option>
+			<option value="káva instantní"></option>
+			<option value="minerálka"></option>
+			<option value="džus pomerančový"></option>
+			<option value="džus jablečný"></option>
+		</datalist>
+
+		<footer class="site-footer">
+			<div class="container">
+				<p>&copy; <span id="year"></span> Gurm-ni</p>
+			</div>
+		</footer>
+
+		<script>
+			const STORAGE_KEY = "gurmni_potraviny";
+
+			const yearEl = document.getElementById("year");
+			if (yearEl) {
+				yearEl.textContent = new Date().getFullYear();
+			}
+
+			const form = document.getElementById("ingredientForm");
+			const nameInput = document.getElementById("ingredientName");
+			const noteInput = document.getElementById("ingredientNote");
+			const listEl = document.getElementById("ingredientsList");
+
+			function loadIngredients() {
+				try {
+					const raw = localStorage.getItem(STORAGE_KEY);
+					if (!raw) return [];
+					const parsed = JSON.parse(raw);
+					return Array.isArray(parsed) ? parsed : [];
+				} catch (e) {
+					return [];
+				}
+			}
+
+			function saveIngredients(items) {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+			}
+
+			function renderIngredients() {
+				const items = loadIngredients();
+				if (!items.length) {
+					listEl.innerHTML = '<li class="potraviny-empty">Zatím nemáš žádné suroviny.</li>';
+					return;
+				}
+
+				listEl.innerHTML = items
+					.map(
+						(item) => `
+							<li class="potraviny-item" data-id="${item.id}">
+								<div class="potraviny-item-main">
+									<span class="potraviny-item-name">${item.name}</span>
+									${
+										item.note
+											? `<span class="potraviny-item-note">${item.note}</span>`
+											: ""
+									}
+								</div>
+								<button type="button" class="btn-ghost potraviny-remove">Odstranit</button>
+							</li>
+						`
+					)
+					.join("");
+			}
+
+			form?.addEventListener("submit", (event) => {
+				event.preventDefault();
+				const name = nameInput.value.trim();
+				const note = noteInput.value.trim();
+				if (!name) return;
+
+				const items = loadIngredients();
+				items.push({
+					id: Date.now(),
+					name,
+					note,
+				});
+
+				saveIngredients(items);
+				nameInput.value = "";
+				noteInput.value = "";
+				nameInput.focus();
+				renderIngredients();
+			});
+
+			listEl?.addEventListener("click", (event) => {
+				const target = event.target;
+				if (!(target instanceof HTMLElement)) return;
+				if (!target.classList.contains("potraviny-remove")) return;
+
+				const li = target.closest(".potraviny-item");
+				if (!li) return;
+				const id = Number(li.getAttribute("data-id"));
+				if (!id) return;
+
+				let items = loadIngredients();
+				items = items.filter((item) => item.id !== id);
+				saveIngredients(items);
+				renderIngredients();
+			});
+
+			renderIngredients();
+		</script>
+	</body>
+</html>
