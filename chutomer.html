@@ -173,6 +173,7 @@
 			const surpriseButton = document.querySelector(".btn-secondary");
 
 			const timeLabels = ["<15 min", "15–30 min", "30–60 min", ">1 h"];
+			let allRecipes = [];
 
 			function renderRecipes(recipes) {
 				resultsContainer.innerHTML = "";
@@ -185,13 +186,21 @@
 					return;
 				}
 
-				recipes.forEach((recipe) => {
-					const article = document.createElement("article");
-					article.className = "recipe-card";
+					recipes.forEach((recipe) => {
+						const article = document.createElement("article");
+						article.className = "recipe-card";
 
-					const imgPlaceholder = document.createElement("div");
-					imgPlaceholder.className = "recipe-image-placeholder";
-					imgPlaceholder.setAttribute("aria-hidden", "true");
+						let imageEl;
+						if (recipe.photo_url) {
+							imageEl = document.createElement("img");
+							imageEl.className = "recipe-card-photo";
+							imageEl.src = recipe.photo_url;
+							imageEl.alt = recipe.name || "Foto receptu";
+						} else {
+							imageEl = document.createElement("div");
+							imageEl.className = "recipe-image-placeholder";
+							imageEl.setAttribute("aria-hidden", "true");
+						}
 
 					const info = document.createElement("div");
 					info.className = "recipe-info";
@@ -225,11 +234,20 @@
 						metaRow.appendChild(span);
 					}
 
-					info.appendChild(title);
-					info.appendChild(metaRow);
+						info.appendChild(title);
+						info.appendChild(metaRow);
 
-					article.appendChild(imgPlaceholder);
+						article.appendChild(imageEl);
 					article.appendChild(info);
+
+						// Kliknutí na kartu otevře detail receptu
+						if (recipe.id) {
+							article.addEventListener("click", () => {
+								window.location.href = `recept.html?id=${encodeURIComponent(
+									recipe.id
+								)}`;
+							});
+						}
 
 					resultsContainer.appendChild(article);
 				});
@@ -248,7 +266,27 @@
 						return [];
 					}
 
-					return data ?? [];
+					const withUrls = await Promise.all(
+						(data ?? []).map(async (recipe) => {
+							if (recipe.photo_path) {
+								try {
+									const { data: signed, error: signedError } =
+										await supabase.storage
+											.from("recipe-photos")
+											.createSignedUrl(recipe.photo_path, 60 * 60);
+									if (!signedError && signed?.signedUrl) {
+										recipe.photo_url = signed.signedUrl;
+									}
+								} catch (e) {
+									console.warn("Nepodařilo se vytvořit URL fotky", e);
+								}
+							}
+							return recipe;
+						})
+					);
+
+					allRecipes = withUrls;
+					return allRecipes;
 				} catch (err) {
 					console.error("Neočekávaná chyba při načítání receptů", err);
 					alert("Došlo k neočekávané chybě při načítání receptů.");
@@ -261,22 +299,118 @@
 				renderRecipes(recipes);
 			}
 
-			// Hledat – pro teď prostě načte všechny recepty uživatele
-			if (searchButton) {
-				searchButton.addEventListener("click", () => {
-					loadAllRecipes();
+			function getFilteredRecipes(source) {
+				if (!source || !source.length) return [];
+
+				// Typ jídla
+				const activeMealEl = document.querySelector(
+					".meal-chip.meal-chip-active .meal-label-main"
+				);
+				const activeMeal = activeMealEl
+					? activeMealEl.textContent.trim().toUpperCase()
+					: null;
+
+				// Čas
+				const timeSlider = document.querySelector(".time-slider");
+				const selectedBucket = timeSlider ? Number(timeSlider.value) : null;
+
+				// Omezení
+				const selectedDietary = Array.from(
+					document.querySelectorAll(".pill.pill-on")
+				).map((el) => el.textContent.trim().toUpperCase());
+
+				// Vibe
+				const selectedVibes = Array.from(
+					document.querySelectorAll(".pill-icon.pill-on")
+				).map((el) => el.textContent.trim().toLowerCase());
+
+				// Ingredience (fulltext)
+				const ingredientInput = document.getElementById("ingredient");
+				const ingredientQuery = ingredientInput
+					? ingredientInput.value.trim().toLowerCase()
+					: "";
+
+				return source.filter((recipe) => {
+					// Typ jídla
+					if (activeMeal && recipe.meal_type) {
+						if (recipe.meal_type.trim().toUpperCase() !== activeMeal) {
+							return false;
+						}
+					}
+
+					// Čas
+					if (
+						selectedBucket !== null &&
+						selectedBucket !== undefined &&
+						recipe.prep_time_bucket !== null &&
+						recipe.prep_time_bucket !== undefined
+					) {
+						if (Number(recipe.prep_time_bucket) !== selectedBucket) {
+							return false;
+						}
+					}
+
+					// Omezení
+					if (selectedDietary.length) {
+						const dietary = Array.isArray(recipe.dietary)
+							? recipe.dietary.map((d) => String(d).trim().toUpperCase())
+							: [];
+						const allMatch = selectedDietary.every((tag) =>
+							dietary.includes(tag)
+						);
+						if (!allMatch) return false;
+					}
+
+					// Vibe
+					if (selectedVibes.length) {
+						const vibes = Array.isArray(recipe.vibes)
+							? recipe.vibes.map((v) => String(v).trim().toLowerCase())
+							: [];
+						const allMatch = selectedVibes.every((tag) =>
+							vibes.includes(tag)
+						);
+						if (!allMatch) return false;
+					}
+
+					// Ingredience fulltext
+					if (ingredientQuery) {
+						const ingredients = Array.isArray(recipe.ingredients)
+							? recipe.ingredients
+							: [];
+						const hasMatch = ingredients.some((ing) =>
+							String(ing).toLowerCase().includes(ingredientQuery)
+						);
+						if (!hasMatch) return false;
+					}
+
+					return true;
 				});
 			}
 
-			// Překvap mě – náhodný recept z uživatelových receptů
+			// Hledat – použije všechny zvolené filtry
+			if (searchButton) {
+				searchButton.addEventListener("click", async () => {
+					if (!allRecipes.length) {
+						await loadAllRecipes();
+					}
+					const filtered = getFilteredRecipes(allRecipes);
+					renderRecipes(filtered);
+				});
+			}
+
+			// Překvap mě – náhodný recept z filtrovaného seznamu
 			if (surpriseButton) {
 				surpriseButton.addEventListener("click", async () => {
-					const recipes = await fetchRecipes();
-					if (!recipes.length) {
+					if (!allRecipes.length) {
+						await loadAllRecipes();
+					}
+					const filtered = getFilteredRecipes(allRecipes);
+					if (!filtered.length) {
 						renderRecipes([]);
 						return;
 					}
-					const random = recipes[Math.floor(Math.random() * recipes.length)];
+					const random =
+						filtered[Math.floor(Math.random() * filtered.length)];
 					renderRecipes([random]);
 				});
 			}

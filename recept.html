@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ŠPAJZ | Recept</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body class="app-body">
+		<main class="recipe-detail-page">
+			<header class="recipe-detail-header">
+				<a href="chutomer.html" class="recipe-back-link">Zpět</a>
+			</header>
+
+			<section class="recipe-detail-card">
+				<div class="recipe-detail-photo-wrapper">
+					<div class="recipe-detail-photo-placeholder" id="detail-photo-placeholder"></div>
+					<img
+						id="detail-photo"
+						alt="Foto receptu"
+						class="recipe-detail-photo hidden"
+					/>
+				</div>
+
+				<h1 id="detail-title" class="recipe-detail-title">Recept</h1>
+
+				<div class="recipe-detail-tags" id="detail-tags">
+					<!-- tags will be injected here -->
+				</div>
+
+				<div class="recipe-detail-section">
+					<h2 class="recipe-detail-subheading">Ingredience:</h2>
+					<ol id="detail-ingredients" class="ingredient-list ingredient-list-detail"></ol>
+				</div>
+
+				<div class="recipe-detail-section">
+					<h2 class="recipe-detail-subheading">Postup:</h2>
+					<ol id="detail-steps" class="steps-list steps-list-detail"></ol>
+				</div>
+			</section>
+		</main>
+
+		<script type="module">
+			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
+
+			const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			if (!session) {
+				window.location.href = "index.html";
+			}
+
+			const params = new URLSearchParams(window.location.search);
+			const id = params.get("id");
+			if (!id) {
+				alert("Chybí identifikátor receptu.");
+			}
+
+			const titleEl = document.getElementById("detail-title");
+			const photoEl = document.getElementById("detail-photo");
+			const photoPlaceholderEl = document.getElementById(
+				"detail-photo-placeholder"
+			);
+			const tagsEl = document.getElementById("detail-tags");
+			const ingredientsEl = document.getElementById("detail-ingredients");
+			const stepsEl = document.getElementById("detail-steps");
+
+			const timeLabels = ["<15 min", "15–30 min", "30–60 min", ">1 h"];
+
+			function addTag(text) {
+				if (!text) return;
+				const span = document.createElement("span");
+				span.className = "recipe-tag";
+				span.textContent = text;
+				tagsEl.appendChild(span);
+			}
+
+			async function loadRecipe() {
+				try {
+					const { data: recipe, error } = await supabase
+						.from("recipes")
+						.select("*")
+						.eq("id", id)
+						.single();
+
+					if (error) {
+						console.error("Chyba při načítání receptu", error);
+						alert("Nepodařilo se načíst recept.");
+						return;
+					}
+
+					if (!recipe) {
+						alert("Recept nebyl nalezen.");
+						return;
+					}
+
+					titleEl.textContent = recipe.name || "Recept";
+
+					// Tagy: omezení / typ / čas / vibe
+					tagsEl.innerHTML = "";
+					if (Array.isArray(recipe.dietary) && recipe.dietary.length) {
+						addTag(recipe.dietary[0]);
+					}
+					if (
+						recipe.prep_time_bucket !== null &&
+						recipe.prep_time_bucket !== undefined
+					) {
+						const idx = Number(recipe.prep_time_bucket);
+						addTag(timeLabels[idx] ?? "");
+					}
+					if (Array.isArray(recipe.vibes) && recipe.vibes.length) {
+						addTag(recipe.vibes[0]);
+					}
+
+					// Foto (podepsaný URL, funguje i pro soukromý bucket)
+					if (recipe.photo_path) {
+						const { data: signed, error: signedError } = await supabase
+							.storage
+							.from("recipe-photos")
+							.createSignedUrl(recipe.photo_path, 60 * 60);
+						if (!signedError && signed?.signedUrl) {
+							photoEl.src = signed.signedUrl;
+							photoEl.classList.remove("hidden");
+							photoPlaceholderEl.classList.add("hidden");
+						}
+					}
+
+					// Ingredience
+					ingredientsEl.innerHTML = "";
+					if (Array.isArray(recipe.ingredients) && recipe.ingredients.length) {
+						recipe.ingredients.forEach((ing) => {
+							const li = document.createElement("li");
+							li.textContent = ing;
+							ingredientsEl.appendChild(li);
+						});
+					}
+
+					// Postup
+					stepsEl.innerHTML = "";
+					if (Array.isArray(recipe.steps) && recipe.steps.length) {
+						recipe.steps.forEach((step) => {
+							const li = document.createElement("li");
+							li.textContent = step;
+							stepsEl.appendChild(li);
+						});
+					}
+				} catch (err) {
+					console.error("Neočekávaná chyba při načítání receptu", err);
+					alert("Došlo k neočekávané chybě při načítání receptu.");
+				}
+			}
+
+			if (id) {
+				loadRecipe();
+			}
+		</script>
+	</body>
+</html>

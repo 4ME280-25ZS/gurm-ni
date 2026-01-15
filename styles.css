@@ -503,9 +503,107 @@ body.app-body {
 	padding-inline: 2.2rem;
 }
 
+/* Detail receptu */
+
+.recipe-detail-page {
+	max-width: 430px;
+	margin: 0 auto;
+	padding: 1.1rem 1.1rem 1.8rem;
+}
+
+.recipe-detail-header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	margin-bottom: 0.6rem;
+}
+
+.recipe-detail-card {
+	background-color: #dde7da;
+	border-radius: 1.2rem;
+	border: 2px solid #c4d1c2;
+	padding: 0.8rem 0.85rem 1.1rem;
+}
+
+.recipe-detail-photo-wrapper {
+	border-radius: 0.9rem;
+	overflow: hidden;
+	margin-bottom: 0.7rem;
+}
+
+.recipe-detail-photo-placeholder {
+	height: 150px;
+	background: linear-gradient(135deg, #d1fae5, #fef3c7);
+}
+
+.recipe-detail-photo {
+	display: block;
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+}
+
+.recipe-detail-title {
+	margin: 0 0 0.4rem;
+	font-family: "Cherry Bomb One", system-ui, -apple-system,
+		BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 1.3rem;
+	letter-spacing: 0.06em;
+	color: #2f3e32;
+}
+
+.recipe-detail-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin-bottom: 0.6rem;
+}
+
+.recipe-detail-section {
+	margin-bottom: 0.7rem;
+}
+
+.recipe-detail-subheading {
+	margin: 0 0 0.25rem;
+	font-size: 0.9rem;
+	color: #2f3e32;
+}
+
+.ingredient-list-detail {
+	list-style: decimal;
+	margin-left: 1.3rem;
+}
+
+.ingredient-list-detail li {
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 0.7rem;
+	padding: 0.25rem 0.55rem;
+	margin-bottom: 0.2rem;
+}
+
+.steps-list-detail {
+	margin-top: 0.2rem;
+	margin-left: 1.3rem;
+}
+
+.steps-list-detail li {
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 0.7rem;
+	padding: 0.25rem 0.55rem;
+	margin-bottom: 0.25rem;
+	font-size: 0.82rem;
+}
+
 .recipe-image-placeholder {
 	height: 160px;
 	background: linear-gradient(135deg, #d1fae5, #fef3c7);
+}
+
+.recipe-card-photo {
+	display: block;
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
 }
 
 .recipe-info {
