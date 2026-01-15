@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ŠPAJZ | Receptář</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body class="app-body">
+		<div class="app-menu-backdrop" id="menu-backdrop-receptar">
+			<nav class="app-menu-panel" aria-label="Hlavní navigace">
+				<h2 class="app-menu-title">Menu</h2>
+				<ul class="app-menu-list">
+					<li><a href="chutomer.html" class="app-menu-link">Chuťoměr</a></li>
+					<li>
+						<a href="receptar.html" class="app-menu-link app-menu-link-active"
+								>Receptář</a
+						>
+					</li>
+					<li><a href="profil.html" class="app-menu-link">Profil</a></li>
+				</ul>
+			</nav>
+		</div>
+
+		<main class="taste-page">
+			<header class="taste-header">
+				<button
+					class="app-menu-toggle"
+					type="button"
+					aria-label="Otevřít menu"
+					aria-controls="menu-backdrop-receptar"
+				>
+					<div class="app-menu-icon" aria-hidden="true">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+				</button>
+				<h1 class="taste-title">RECEPTÁŘ</h1>
+			</header>
+
+			<section class="recipe-shelf">
+				<a href="#" class="recipe-shelf-card">
+					<div class="recipe-shelf-icon" aria-hidden="true">🍲</div>
+					<div class="recipe-shelf-text">Full Meals</div>
+				</a>
+
+				<a href="#" class="recipe-shelf-card">
+					<div class="recipe-shelf-icon" aria-hidden="true">🍳</div>
+					<div class="recipe-shelf-text">Snídaně</div>
+				</a>
+
+				<a href="#" class="recipe-shelf-card">
+					<div class="recipe-shelf-icon" aria-hidden="true">🍿</div>
+					<div class="recipe-shelf-text">Snacks</div>
+				</a>
+
+				<a href="#" class="recipe-shelf-card">
+					<div class="recipe-shelf-icon" aria-hidden="true">🧁</div>
+					<div class="recipe-shelf-text">Dezerty</div>
+				</a>
+			</section>
+
+			<a
+				class="recipe-add-button"
+				href="novy-recept.html"
+				aria-label="Přidat recept"
+			>
+				+
+			</a>
+		</main>
+
+		<script type="module">
+			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.js";
+			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
+
+			const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			if (!session) {
+				window.location.href = "index.html";
+			}
+
+			const backdrop = document.getElementById("menu-backdrop-receptar");
+			const toggle = document.querySelector(".app-menu-toggle");
+			const closeMenu = () => backdrop.classList.remove("is-open");
+			toggle.addEventListener("click", () => {
+				backdrop.classList.toggle("is-open");
+			});
+			backdrop.addEventListener("click", (e) => {
+				if (e.target === backdrop) closeMenu();
+			});
+		</script>
+	</body>
+</html>

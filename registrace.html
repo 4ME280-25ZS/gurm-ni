@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ŠPAJZ | Registrace</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body class="login-body">
+		<main class="login-page" aria-labelledby="register-heading">
+			<section class="login-header">
+				<div class="login-logo">
+					<div class="logo-hat-wrapper" aria-hidden="true">
+						<img src="Vector.svg" alt="" class="logo-hat" />
+						<img src="Group 1.svg" alt="" class="logo-fork-svg" />
+					</div>
+					<img src="Group.svg" alt="ŠPAJZ" class="logo-text" />
+					<h1 class="logo-title sr-only">ŠPAJZ</h1>
+				</div>
+				<h2 id="register-heading" class="login-heading">REGISTRACE</h2>
+			</section>
+
+			<section class="login-section">
+				<form class="login-form" id="register-form">
+					<label class="sr-only" for="name">Jméno</label>
+					<input
+						id="name"
+						name="name"
+						type="text"
+						class="login-input"
+						placeholder="Jméno (nepovinné)"
+					/>
++
+					<label class="sr-only" for="reg-email">Email</label>
+					<input
+						id="reg-email"
+						name="email"
+						type="email"
+						class="login-input"
+						placeholder="Email"
+						required
+					/>
++
+					<label class="sr-only" for="reg-password">Heslo</label>
+					<input
+						id="reg-password"
+						name="password"
+						type="password"
+						class="login-input"
+						placeholder="Heslo"
+						required
+					/>
++
+					<label class="sr-only" for="reg-password2">Potvrď heslo</label>
+					<input
+						id="reg-password2"
+						name="password2"
+						type="password"
+						class="login-input"
+						placeholder="Potvrď heslo"
+						required
+					/>
+
+					<button type="submit" class="login-button">Registrovat</button>
+				</form>
+				<div class="auth-switch">
+					<span>Už máš účet?</span>
+					<a href="index.html" class="auth-switch-link">Přihlášení</a>
+				</div>
+			</section>
+		</main>
+		<script type="module">
+			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.js";
+			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
+
+			const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+			const form = document.getElementById("register-form");
+			form.addEventListener("submit", async (e) => {
+				e.preventDefault();
+				const name = document.getElementById("name").value.trim();
+				const email = document.getElementById("reg-email").value.trim();
+				const password = document.getElementById("reg-password").value;
+				const password2 = document.getElementById("reg-password2").value;
+
+				if (password !== password2) {
+					alert("Hesla se neshodují.");
+					return;
+				}
+
+				const { error } = await supabase.auth.signUp({
+					email,
+					password,
+					options: {
+						data: name ? { name } : undefined,
+					},
+				});
+
+				if (error) {
+					alert("Registrace se nezdařila: " + error.message);
+					return;
+				}
+
+				alert(
+					"Účet byl vytvořen. Pokud je vyžadováno potvrzení emailu, zkontroluj svou schránku."
+				);
+				window.location.href = "index.html";
+			});
+		</script>
+	</body>
+</html>

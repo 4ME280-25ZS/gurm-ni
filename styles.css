@@ -9,6 +9,681 @@ body {
 	color: #222;
 }
 
+/* Login page */
+
+body.login-body {
+	min-height: 100vh;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #fcf8ef;
+}
+
+/* Chuťoměr page */
+
+body.app-body {
+	margin: 0;
+	font-family: "Jost", system-ui, -apple-system, BlinkMacSystemFont,
+		"Segoe UI", sans-serif;
+	background-color: #fcf8ef;
+}
+
+.taste-page {
+	max-width: 430px;
+	margin: 0 auto;
+	padding: 1.4rem 1.1rem 2.5rem;
+}
+
+.taste-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1.2rem;
+}
+
+.taste-title {
+	margin: 0 auto;
+	font-family: "Cherry Bomb One", system-ui, -apple-system,
+		BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 1.75rem;
+	letter-spacing: 0.12em;
+	color: #2f3e32;
+}
+
+.app-menu-toggle {
+	border: none;
+	background: none;
+	padding: 0.25rem;
+	border-radius: 999px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.app-menu-icon {
+	width: 18px;
+	height: 14px;
+	position: relative;
+}
+
+.app-menu-icon span {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 2px;
+	border-radius: 999px;
+	background-color: #2f3e32;
+}
+
+.app-menu-icon span:nth-child(1) {
+	top: 0;
+}
+
+.app-menu-icon span:nth-child(2) {
+	top: 6px;
+}
+
+.app-menu-icon span:nth-child(3) {
+	bottom: 0;
+}
+
+.app-menu-backdrop {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(15, 23, 42, 0.25);
+	z-index: 20;
+	display: none;
+}
+
+.app-menu-panel {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 70vw;
+	max-width: 260px;
+	height: 100%;
+	background-color: #fcf8ef;
+	box-shadow: 4px 0 16px rgba(15, 23, 42, 0.18);
+	padding: 1.2rem 1rem;
+}
+
+.app-menu-title {
+	margin: 0 0 0.75rem;
+	font-family: "Cherry Bomb One", system-ui, -apple-system,
+		BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 1.1rem;
+	letter-spacing: 0.08em;
+	color: #2f3e32;
+}
+
+.app-menu-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+
+.app-menu-link {
+	display: block;
+	padding: 0.55rem 0.4rem;
+	border-radius: 0.6rem;
+	text-decoration: none;
+	color: #111827;
+	font-size: 0.9rem;
+}
+
+.app-menu-link-active {
+	background-color: #b2f26b;
+}
+
+.app-menu-backdrop.is-open {
+	display: block;
+}
+
+.taste-section {
+	margin-bottom: 1rem;
+}
+
+.taste-label {
+	margin: 0 0 0.4rem;
+	font-size: 0.9rem;
+	color: #374151;
+}
+
+.taste-meal-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.4rem;
+}
+
+.meal-chip {
+	border: none;
+	border-radius: 0.9rem;
+	padding: 0.4rem 0.3rem;
+	background-color: #e5e7eb;
+	color: #374151;
+	font-size: 0.55rem;
+	text-align: center;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.1rem;
+}
+
+.meal-chip-active {
+	background-color: #b2f26b;
+	color: #1f2933;
+}
+
+.meal-icon {
+	font-size: 0.8rem;
+}
+
+.meal-label-main {
+	font-weight: 600;
+}
+
+.time-scale {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.65rem;
+	color: #6b7280;
+	margin-bottom: 0.35rem;
+}
+
+.time-slider {
+	width: 100%;
+}
+
+.pill-row {
+	display: flex;
+	gap: 0.4rem;
+	flex-wrap: wrap;
+}
+
+.pill-row-multi {
+	margin-top: 0.1rem;
+}
+
+.pill,
+.pill-icon {
+	border-radius: 999px;
+	border: 1px solid #d1d5db;
+	background-color: #f3f4f6;
+	color: #374151;
+	padding: 0.25rem 0.7rem;
+	font-size: 0.7rem;
+	cursor: pointer;
+}
+
+.pill-icon {
+	text-transform: lowercase;
+}
+
+.pill-on {
+	background-color: #b2f26b;
+	border-color: #9bd94f;
+	color: #1f2933;
+}
+
+.search-wrapper {
+	position: relative;
+}
+
+.search-icon {
+	position: absolute;
+	top: 50%;
+	left: 0.8rem;
+	transform: translateY(-50%);
+	font-size: 0.8rem;
+	color: #9ca3af;
+}
+
+.search-input {
+	width: 100%;
+	border-radius: 999px;
+	border: none;
+	padding: 0.6rem 0.9rem 0.6rem 2.1rem;
+	font-size: 0.85rem;
+	background-color: #f0f0f4;
+}
+
+.taste-actions {
+	display: flex;
+	gap: 0.6rem;
+}
+
+.btn-secondary {
+	flex: 1;
+	border-radius: 999px;
+	border: 1px solid #111827;
+	background-color: #fcf8ef;
+	color: #111827;
+	font-size: 0.8rem;
+	padding: 0.5rem 0.7rem;
+	cursor: pointer;
+}
+
+.btn-primary-wide {
+	flex: 1.3;
+	border-radius: 999px;
+	border: none;
+	background-color: #2f3e32;
+	color: #ffffff;
+	font-size: 0.8rem;
+	padding: 0.5rem 0.7rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+.recipe-card {
+	border-radius: 1rem;
+	overflow: hidden;
+	background-color: #d1fae5;
+}
+
+.recipe-shelf {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	margin-top: 0.5rem;
+}
+
+.recipe-shelf-card {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1rem;
+	border-radius: 0.9rem;
+	background-color: #dde7da;
+	border: 1px solid #c4d1c2;
+	text-decoration: none;
+	color: #2f3e32;
+	box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+}
+
+.recipe-shelf-icon {
+	font-size: 1.4rem;
+}
+
+.recipe-shelf-text {
+	font-family: "Jost", system-ui, -apple-system, BlinkMacSystemFont,
+		"Segoe UI", sans-serif;
+	font-size: 0.95rem;
+}
+
+.recipe-add-button {
+	position: fixed;
+	bottom: 1.6rem;
+	right: calc(50% - 180px);
+	width: 42px;
+	height: 42px;
+	border-radius: 999px;
+	border: none;
+	background-color: #2f3e32;
+	color: #ffffff;
+	font-size: 1.5rem;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.4);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.recipe-form-page {
+	max-width: 430px;
+	margin: 0 auto;
+	padding: 1.1rem 1.1rem 1.8rem;
+}
+
+.recipe-form-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.2rem;
+	margin-bottom: 0.7rem;
+}
+
+.recipe-back-link {
+	align-self: flex-start;
+	font-size: 0.8rem;
+	color: #2f3e32;
+	text-decoration: none;
+}
+
+.recipe-form-title {
+	margin: 0;
+	font-family: "Cherry Bomb One", system-ui, -apple-system,
+		BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 1.6rem;
+	letter-spacing: 0.08em;
+	color: #2f3e32;
+}
+
+.recipe-form-card {
+	background-color: #dde7da;
+	border-radius: 1.2rem;
+	border: 2px solid #c4d1c2;
+	padding: 0.8rem 0.85rem 1.1rem;
+}
+
+.recipe-photo-field {
+	margin-bottom: 0.8rem;
+}
+
+.recipe-photo-drop {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.9rem;
+	background-color: #ccd7c7;
+	height: 140px;
+	border: 1px dashed #9aa79a;
+	font-size: 0.8rem;
+	color: #374151;
+	position: relative;
+	overflow: hidden;
+}
+
+.recipe-photo-icon {
+	font-size: 2rem;
+	margin-bottom: 0.35rem;
+}
+
+.recipe-photo-drop.has-photo .recipe-photo-icon,
+.recipe-photo-drop.has-photo p {
+	opacity: 0;
+}
+
+.recipe-photo-preview {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.hidden {
+	display: none;
+}
+
+.sr-only-input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+.recipe-field-label {
+	margin: 0 0 0.25rem;
+	font-size: 0.85rem;
+	color: #2f3e32;
+}
+
+.recipe-field-group {
+	margin-bottom: 0.7rem;
+}
+
+.recipe-text-input {
+	width: 100%;
+	border-radius: 999px;
+	border: none;
+	padding: 0.45rem 0.8rem;
+	font-size: 0.85rem;
+	background-color: #f0f0f4;
+}
+
+.recipe-field-label-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.recipe-add-ingredient {
+	border: none;
+	background: none;
+	color: #2f3e32;
+	font-size: 0.7rem;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.ingredient-list {
+	list-style: disc;
+	margin: 0.3rem 0 0 1.2rem;
+	padding: 0;
+	font-size: 0.8rem;
+}
+
+.steps-list {
+	margin: 0;
+	padding-left: 1.2rem;
+	list-style: decimal;
+}
+
+.steps-item {
+	margin-bottom: 0.35rem;
+}
+
+.step-input {
+	width: 100%;
+	border-radius: 0.6rem;
+	border: none;
+	padding: 0.45rem 0.6rem;
+	font-size: 0.8rem;
+	resize: none;
+	background-color: #f0f0f4;
+}
+
+.recipe-submit-row {
+	margin-top: 0.8rem;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.recipe-submit-button {
+	flex: 0 0 auto;
+	padding-inline: 2.2rem;
+}
+
+.recipe-image-placeholder {
+	height: 160px;
+	background: linear-gradient(135deg, #d1fae5, #fef3c7);
+}
+
+.recipe-info {
+	padding: 0.6rem 0.8rem 0.85rem;
+}
+
+.recipe-title {
+	margin: 0 0 0.35rem;
+	font-size: 0.95rem;
+	color: #111827;
+}
+
+.recipe-meta-row {
+	display: flex;
+	gap: 0.4rem;
+	flex-wrap: wrap;
+}
+
+.recipe-tag {
+	font-size: 0.7rem;
+	border-radius: 999px;
+	background-color: rgba(255, 255, 255, 0.85);
+	padding: 0.15rem 0.55rem;
+	color: #374151;
+}
+
+.login-page {
+	margin-bottom: 1.4rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	max-width: 420px;
+	padding: 2.5rem 1.5rem 3rem;
+}
+
+.logo-hat-wrapper {
+	position: relative;
+	display: inline-block;
+	width: 170px;
+	max-width: 70vw;
+}
+
+.logo-hat {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.logo-fork-svg {
+	position: absolute;
+	top: 60%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 80%;
+	height: auto;
+}
+
+.logo-text {
+	display: block;
+	width: 110px;
+	max-width: 70vw;
+	height: auto;
+	margin: 0rem auto 0.6rem;
+}
+
+.login-logo {
+	margin-bottom: 1.4rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.logo-image {
+	display: block;
+	width: 150px;
+	height: auto;
+	margin: 0 auto 0.8rem;
+}
+
+.logo-title {
+	margin: 0;
+	font-size: 1.5rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #2f3e32;
+}
+
+.login-heading {
+	margin: 0;
+	font-size: 1.4rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: #2f3e32;
+	font-family: "Cherry Bomb One", system-ui, -apple-system, BlinkMacSystemFont,
+		"Segoe UI", sans-serif;
+}
+
+.login-section {
+	max-width: 320px;
+	margin: 0 auto;
+}
+
+.login-form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.auth-switch {
+	margin-top: 0.8rem;
+	display: flex;
+	justify-content: center;
+	gap: 0.4rem;
+	font-size: 0.8rem;
+	color: #374151;
+}
+
+.auth-switch-link {
+	color: #2f3e32;
+	text-decoration: underline;
+}
+
+.login-input {
+	border: none;
+	border-radius: 999px;
+	padding: 0.7rem 1.1rem;
+	font-size: 0.95rem;
+	background-color: #f0f0f4;
+	color: #111827;
+	outline: none;
+}
+
+.login-input::placeholder {
+	color: #9ca3af;
+}
+
+.login-input:focus {
+	box-shadow: 0 0 0 2px rgba(55, 65, 81, 0.3);
+	background-color: #f9fafb;
+}
+
+.login-button {
+	margin-top: 0.9rem;
+	border: none;
+	border-radius: 999px;
+	padding: 0.7rem 1.5rem;
+	font-size: 0.9rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	background-color: #2f3e32;
+	color: #ffffff;
+	cursor: pointer;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.35);
+	transition: transform 0.12s ease, box-shadow 0.12s ease,
+		background-color 0.12s ease;
+	font-family: "Cherry Bomb One", system-ui, -apple-system, BlinkMacSystemFont,
+		"Segoe UI", sans-serif;
+}
+
+.login-button:hover {
+	background-color: #253227;
+	transform: translateY(-1px);
+	box-shadow: 0 14px 30px rgba(15, 23, 42, 0.4);
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
 .container {
 	max-width: 1100px;
 	margin: 0 auto;

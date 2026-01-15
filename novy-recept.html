@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ŠPAJZ | Nový recept</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body class="app-body">
+		<main class="recipe-form-page">
+			<header class="recipe-form-header">
+				<a href="receptar.html" class="recipe-back-link">Zpět</a>
+				<h1 class="recipe-form-title">Nový Recept</h1>
+			</header>
+
+			<section class="recipe-form-card">
+				<form id="recipe-form">
+					<div class="recipe-photo-field">
+						<label for="photo" class="recipe-photo-drop">
+							<div class="recipe-photo-icon" aria-hidden="true">📷</div>
+							<p>Přidej fotku</p>
+							<input
+								id="photo"
+								type="file"
+								accept="image/*"
+								capture="environment"
+								class="sr-only-input"
+							/>
+							<img
+								id="photo-preview"
+								alt="Náhled fotky receptu"
+								class="recipe-photo-preview hidden"
+							/>
+						</label>
+					</div>
+
+					<label class="recipe-field-label" for="recipe-name">Název:</label>
+					<input
+						id="recipe-name"
+						name="name"
+						class="recipe-text-input"
+						type="text"
+						placeholder="Název receptu"
+						required
+					/>
+
+					<div class="recipe-field-group">
+						<p class="recipe-field-label">Typ:</p>
+						<div class="taste-meal-grid" role="group" aria-label="Typ jídla">
+							<button type="button" class="meal-chip meal-chip-active">
+								<span class="meal-icon" aria-hidden="true">🍽️</span>
+								<span class="meal-label-main">FULL MEAL</span>
+							</button>
+							<button type="button" class="meal-chip">
+								<span class="meal-icon" aria-hidden="true">🌅</span>
+								<span class="meal-label-main">SNÍDANĚ</span>
+							</button>
+							<button type="button" class="meal-chip">
+								<span class="meal-icon" aria-hidden="true">🥨</span>
+								<span class="meal-label-main">SNACK</span>
+							</button>
+							<button type="button" class="meal-chip">
+								<span class="meal-icon" aria-hidden="true">🧁</span>
+								<span class="meal-label-main">DEZERT</span>
+							</button>
+						</div>
+					</div>
+
+					<div class="recipe-field-group">
+						<p class="recipe-field-label">Doba přípravy:</p>
+						<div class="time-scale">
+							<span>&lt;15&nbsp;min</span>
+							<span>15–30&nbsp;min</span>
+							<span>30–60&nbsp;min</span>
+							<span>&gt;1&nbsp;h</span>
+						</div>
+						<input
+							class="time-slider"
+							type="range"
+							min="0"
+							max="3"
+							step="1"
+							value="1"
+						/>
+					</div>
+
+					<div class="recipe-field-group">
+						<p class="recipe-field-label">Omezení:</p>
+						<div class="pill-row" aria-label="Stravovací preference">
+							<button type="button" class="pill pill-on">VEGET</button>
+							<button type="button" class="pill">VEGAN</button>
+							<button type="button" class="pill">BEZLEPEK</button>
+							<button type="button" class="pill">BEZLAKTO</button>
+						</div>
+					</div>
+
+					<div class="recipe-field-group">
+						<p class="recipe-field-label">Vibe:</p>
+						<div class="pill-row pill-row-multi" aria-label="Typ chuti">
+							<button type="button" class="pill-icon pill-on">sladké</button>
+							<button type="button" class="pill-icon">slané</button>
+							<button type="button" class="pill-icon">pálivé</button>
+							<button type="button" class="pill-icon">fresh</button>
+							<button type="button" class="pill-icon">smažené</button>
+							<button type="button" class="pill-icon">s masem</button>
+						</div>
+					</div>
+
+					<div class="recipe-field-group">
+						<div class="recipe-field-label-row">
+							<label class="recipe-field-label" for="ingredient-input"
+								>Ingredience:</label
+							>
+							<button
+								type="button"
+								class="recipe-add-ingredient"
+								id="add-ingredient-btn"
+							>
+								přidat ingredienci
+							</button>
+						</div>
+						<input
+							id="ingredient-input"
+							class="recipe-text-input"
+							type="text"
+							placeholder="Napiš ingredienci a klikni přidat"
+						/>
+						<ul id="ingredient-list" class="ingredient-list"></ul>
+					</div>
+
+					<div class="recipe-field-group">
+						<p class="recipe-field-label">Postup:</p>
+						<ol id="steps-list" class="steps-list">
+							<li class="steps-item">
+								<textarea
+									class="step-input"
+									rows="1"
+									placeholder="Napiš první krok a stiskni Enter pro další"
+								></textarea>
+							</li>
+						</ol>
+					</div>
+
+					<div class="recipe-submit-row">
+						<button type="submit" class="btn-primary-wide recipe-submit-button">
+							Přidat
+						</button>
+					</div>
+				</form>
+			</section>
+		</main>
+
+		<script type="module">
+			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.js";
+			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
+
+			const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			if (!session) {
+				window.location.href = "index.html";
+			}
+
+			// Preview selected photo (inside the drop area)
+			const photoInput = document.getElementById("photo");
+			const photoPreview = document.getElementById("photo-preview");
+			const photoDrop = document.querySelector(".recipe-photo-drop");
+			let photoFile = null;
+			if (photoInput && photoPreview && photoDrop) {
+				photoInput.addEventListener("change", (e) => {
+					const file = e.target.files && e.target.files[0];
+					if (!file) return;
+					photoFile = file;
+					const url = URL.createObjectURL(file);
+					photoPreview.src = url;
+					photoPreview.classList.remove("hidden");
+					photoDrop.classList.add("has-photo");
+				});
+			}
+
+			// Toggle chips and pills
+			document.querySelectorAll(".meal-chip").forEach((btn) => {
+				btn.addEventListener("click", () => {
+					document
+						.querySelectorAll(".meal-chip")
+						.forEach((b) => b.classList.remove("meal-chip-active"));
+					btn.classList.add("meal-chip-active");
+				});
+			});
+
+			document.querySelectorAll(".pill, .pill-icon").forEach((btn) => {
+				btn.addEventListener("click", () => {
+					btn.classList.toggle("pill-on");
+				});
+			});
+
+			// Ingredience list
+			const ingredientInput = document.getElementById("ingredient-input");
+			const ingredientList = document.getElementById("ingredient-list");
+			const addIngredientBtn = document.getElementById("add-ingredient-btn");
+			const addIngredient = () => {
+				const value = ingredientInput.value.trim();
+				if (!value) return;
+				const li = document.createElement("li");
+				li.textContent = value;
+				ingredientList.appendChild(li);
+				ingredientInput.value = "";
+			};
+			addIngredientBtn.addEventListener("click", addIngredient);
+			ingredientInput.addEventListener("keydown", (e) => {
+				if (e.key === "Enter") {
+					e.preventDefault();
+					addIngredient();
+				}
+			});
+
+			// Postup steps
+			const stepsList = document.getElementById("steps-list");
+			const attachStepHandler = (textarea) => {
+				textarea.addEventListener("keydown", (e) => {
+					if (e.key === "Enter") {
+						e.preventDefault();
+						if (!textarea.value.trim()) return;
+						const li = document.createElement("li");
+						li.className = "steps-item";
+						const next = document.createElement("textarea");
+						next.className = "step-input";
+						next.rows = 1;
+						li.appendChild(next);
+						stepsList.appendChild(li);
+						next.focus();
+						attachStepHandler(next);
+					}
+				});
+			};
+			const firstStep = stepsList.querySelector(".step-input");
+			if (firstStep) attachStepHandler(firstStep);
+
+			// Submit handler: save recipe to Supabase
+			const form = document.getElementById("recipe-form");
+			form.addEventListener("submit", async (e) => {
+				e.preventDefault();
+
+				const nameInput = document.getElementById("recipe-name");
+				const name = nameInput.value.trim();
+				if (!name) {
+					alert("Zadej název receptu.");
+					return;
+				}
+
+				// Meal type
+				const activeMeal = document.querySelector(".meal-chip.meal-chip-active .meal-label-main");
+				const meal_type = activeMeal ? activeMeal.textContent.trim() : null;
+
+				// Time bucket from slider
+				const timeSlider = document.querySelector(".time-slider");
+				const prep_time_bucket = timeSlider ? Number(timeSlider.value) : null;
+
+				// Dietary and vibe tags
+				const dietary = Array.from(
+					document.querySelectorAll(".pill.pill-on")
+				).map((el) => el.textContent.trim());
+				const vibes = Array.from(
+					document.querySelectorAll(".pill-icon.pill-on")
+				).map((el) => el.textContent.trim());
+
+				// Ingredients
+				const ingredients = Array.from(ingredientList.querySelectorAll("li")).map(
+					(el) => el.textContent.trim()
+				);
+
+				// Steps
+				const steps = Array.from(
+					document.querySelectorAll(".step-input")
+				)
+					.map((t) => t.value.trim())
+					.filter(Boolean);
+
+				let photo_path = null;
+				if (photoFile) {
+					const ext = photoFile.name.split(".").pop() || "jpg";
+					const fileName = `${session.user.id}/${crypto.randomUUID()}.${ext}`;
+					const { data, error: uploadError } = await supabase.storage
+						.from("recipe-photos")
+						.upload(fileName, photoFile);
+					if (uploadError) {
+						console.error(uploadError);
+						alert("Nepodařilo se nahrát fotku, recept ukládám bez ní.");
+					} else {
+						photo_path = data.path;
+					}
+				}
+
+				const { error } = await supabase.from("recipes").insert({
+					user_id: session.user.id,
+					name,
+					meal_type,
+					prep_time_bucket,
+					dietary,
+					vibes,
+					ingredients,
+					steps,
+					photo_path,
+				});
+
+				if (error) {
+					alert("Ukládání receptu se nezdařilo: " + error.message);
+					return;
+				}
+
+				alert("Recept byl uložen.");
+				window.location.href = "receptar.html";
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ŠPAJZ | Chuťoměr</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body class="app-body">
+		<div class="app-menu-backdrop" id="menu-backdrop-chutomer">
+			<nav class="app-menu-panel" aria-label="Hlavní navigace">
+				<h2 class="app-menu-title">Menu</h2>
+				<ul class="app-menu-list">
+					<li>
+						<a href="chutomer.html" class="app-menu-link app-menu-link-active"
+								>Chuťoměr</a
+						>
+					</li>
+					<li><a href="receptar.html" class="app-menu-link">Receptář</a></li>
+					<li><a href="profil.html" class="app-menu-link">Profil</a></li>
+				</ul>
+			</nav>
+		</div>
+
+		<main class="taste-page">
+			<header class="taste-header">
+				<button
+					class="app-menu-toggle"
+					type="button"
+					aria-label="Otevřít menu"
+					aria-controls="menu-backdrop-chutomer"
+				>
+					<div class="app-menu-icon" aria-hidden="true">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+				</button>
+				<h1 class="taste-title">CHUŤOMĚR</h1>
+			</header>
+
+			<section class="taste-section">
+				<p class="taste-label">Mám chuť na:</p>
+				<div class="taste-meal-grid" role="group" aria-label="Typ jídla">
+					<button class="meal-chip meal-chip-active" type="button">
+						<span class="meal-icon" aria-hidden="true">🍽️</span>
+						<span class="meal-label-main">FULL MEAL</span>
+					</button>
+					<button class="meal-chip" type="button">
+						<span class="meal-icon" aria-hidden="true">🌅</span>
+						<span class="meal-label-main">SNÍDANĚ</span>
+					</button>
+					<button class="meal-chip" type="button">
+						<span class="meal-icon" aria-hidden="true">🥨</span>
+						<span class="meal-label-main">SNACK</span>
+					</button>
+					<button class="meal-chip" type="button">
+						<span class="meal-icon" aria-hidden="true">🧁</span>
+						<span class="meal-label-main">DEZERT</span>
+					</button>
+				</div>
+			</section>
+
+			<section class="taste-section">
+				<div class="time-scale">
+					<span>&lt;15&nbsp;min</span>
+					<span>15–30&nbsp;min</span>
+					<span>30–60&nbsp;min</span>
+					<span>&gt;1&nbsp;h</span>
+				</div>
+				<input
+					class="time-slider"
+					type="range"
+					min="0"
+					max="3"
+					step="1"
+					value="1"
+					aria-label="Doba přípravy"
+				/>
+			</section>
+
+			<section class="taste-section">
+				<div class="pill-row" aria-label="Stravovací preference">
+					<button type="button" class="pill pill-on">VEGET</button>
+					<button type="button" class="pill">VEGAN</button>
+					<button type="button" class="pill">BEZLEPEK</button>
+					<button type="button" class="pill">BEZLAKTO</button>
+				</div>
+			</section>
+
+			<section class="taste-section">
+				<div class="pill-row pill-row-multi" aria-label="Typ chuti">
+					<button type="button" class="pill-icon pill-on">sladké</button>
+					<button type="button" class="pill-icon">slané</button>
+					<button type="button" class="pill-icon">pálivé</button>
+					<button type="button" class="pill-icon">fresh</button>
+					<button type="button" class="pill-icon">smažené</button>
+					<button type="button" class="pill-icon">s masem</button>
+				</div>
+			</section>
+
+			<section class="taste-section">
+				<label class="taste-label" for="ingredient">Potřebuji spotřebovat:</label>
+				<div class="search-wrapper">
+					<span class="search-icon" aria-hidden="true">🔍</span>
+					<input
+						id="ingredient"
+						class="search-input"
+						type="search"
+						placeholder="Zadej suroviny..."
+					/>
+				</div>
+			</section>
+
+			<section class="taste-section taste-actions">
+				<button type="button" class="btn-secondary">Překvap mě</button>
+				<button type="button" class="btn-primary-wide">HLEDEJ RECEPT</button>
+			</section>
+
+			<section class="taste-section">
+				<article class="recipe-card">
+					<div class="recipe-image-placeholder" aria-hidden="true"></div>
+					<div class="recipe-info">
+						<h2 class="recipe-title">Špagety aglio e olio</h2>
+						<div class="recipe-meta-row">
+							<span class="recipe-tag">Lehká</span>
+							<span class="recipe-tag">15 min</span>
+							<span class="recipe-tag">2 porce</span>
+						</div>
+					</div>
+				</article>
+			</section>
+		</main>
+
+		<script type="module">
+			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.js";
+			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
+
+			const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			if (!session) {
+				window.location.href = "index.html";
+			}
+
+			// Simple toggle for pills and meal chips (visual only)
+			document.querySelectorAll(".meal-chip").forEach((btn) => {
+				btn.addEventListener("click", () => {
+					document
+						.querySelectorAll(".meal-chip")
+						.forEach((b) => b.classList.remove("meal-chip-active"));
+					btn.classList.add("meal-chip-active");
+				});
+			});
+
+			document.querySelectorAll(".pill, .pill-icon").forEach((btn) => {
+				btn.addEventListener("click", () => {
+					btn.classList.toggle("pill-on");
+				});
+			});
+
+			// Slide-out menu toggle
+			const backdrop = document.getElementById("menu-backdrop-chutomer");
+			const toggle = document.querySelector(".app-menu-toggle");
+			const closeMenu = () => backdrop.classList.remove("is-open");
+			toggle.addEventListener("click", () => {
+				backdrop.classList.toggle("is-open");
+			});
+			backdrop.addEventListener("click", (e) => {
+				if (e.target === backdrop) closeMenu();
+			});
+		</script>
+	</body>
+</html>

@@ -3,74 +3,83 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Gurm-ni | Úvod</title>
+		<title>ŠPAJZ | Přihlášení</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
 		<link rel="stylesheet" href="styles.css" />
 	</head>
-	<body>
-		<header class="site-header">
-			<div class="container header-inner">
-				<h1 class="site-title">Gurm-ni</h1>
-			</div>
-		</header>
-
-		<main class="home-page" aria-labelledby="home-heading">
-			<section class="home-hero">
-				<div class="container">
-					<h2 id="home-heading">Vyber si, s čím chceš pracovat</h2>
-					<p class="home-subtitle">
-						Toto je úvodní stránka. Uživatel jen vidí čtyři velké bloky a
-						kliknutím si otevře podrobnější stránku s funkcemi.
-					</p>
+	<body class="login-body">
+		<main class="login-page" aria-labelledby="login-heading">
+			<section class="login-header">
+				<div class="login-logo">
+					<div class="logo-hat-wrapper" aria-hidden="true">
+						<img src="Vector.svg" alt="" class="logo-hat" />
+						<img src="Group 1.svg" alt="" class="logo-fork-svg" />
+					</div>
+					<img src="Group.svg" alt="ŠPAJZ" class="logo-text" />
+					<h1 class="logo-title sr-only">ŠPAJZ</h1>
 				</div>
+				<h2 id="login-heading" class="login-heading">PŘIHLÁŠENÍ</h2>
 			</section>
 
-			<section class="home-section">
-				<div class="container">
-					<div class="home-grid">
-						<a href="recepty.html" class="home-card">
-							<h3 class="home-card-title">Recepty</h3>
-							<p class="home-card-description">
-								Přehled všech receptů. Později zde může být vyhledávání,
-								filtrování a detail každého receptu.
-							</p>
-						</a>
+			<section class="login-section">
+				<form class="login-form" id="login-form">
+					<label class="sr-only" for="email">Email</label>
+					<input
+						id="email"
+						name="email"
+						type="email"
+						class="login-input"
+						placeholder="Email"
+						required
+					/>
 
-						<a href="potraviny.html" class="home-card">
-							<h3 class="home-card-title">Potraviny</h3>
-							<p class="home-card-description">
-								Místo pro seznam surovin, trvanlivost a stav zásob ve
-								spižírně.
-							</p>
-						</a>
+					<label class="sr-only" for="password">Heslo</label>
+					<input
+						id="password"
+						name="password"
+						type="password"
+						class="login-input"
+						placeholder="Heslo"
+						required
+					/>
 
-						<a href="nakupni-seznam.html" class="home-card">
-							<h3 class="home-card-title">Nákupní seznam</h3>
-							<p class="home-card-description">
-								Jednoduchý přehled, co je potřeba dokoupit. Může být propojený
-								srecepty a potravinami.
-							</p>
-						</a>
-
-						<a href="pridat-recept.html" class="home-card">
-							<h3 class="home-card-title">Přidat recept</h3>
-							<p class="home-card-description">
-								Stránka pro přidání vlastního receptu – název, suroviny, postup
-								a další poznámky.
-							</p>
-						</a>
-					</div>
+					<button type="submit" class="login-button">LOG IN</button>
+				</form>
+				<div class="auth-switch">
+					<span>Nemáš účet?</span>
+					<a href="registrace.html" class="auth-switch-link">Registrace</a>
 				</div>
 			</section>
 		</main>
+		<script type="module">
+			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.js";
+			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
 
-		<footer class="site-footer">
-			<div class="container">
-				<p>&copy; <span id="year"></span> Gurm-ni</p>
-			</div>
-		</footer>
+			const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-		<script>
-			document.getElementById("year").textContent = new Date().getFullYear();
+			const form = document.getElementById("login-form");
+			form.addEventListener("submit", async (e) => {
+				e.preventDefault();
+				const email = document.getElementById("email").value.trim();
+				const password = document.getElementById("password").value;
+
+				const { error } = await supabase.auth.signInWithPassword({
+					email,
+					password,
+				});
+
+				if (error) {
+					alert("Přihlášení se nezdařilo: " + error.message);
+					return;
+				}
+
+				window.location.href = "chutomer.html";
+			});
 		</script>
 	</body>
 </html>
