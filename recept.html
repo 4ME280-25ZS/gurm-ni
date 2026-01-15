@@ -44,7 +44,7 @@
 					<ol id="detail-steps" class="steps-list steps-list-detail"></ol>
 				</div>
 
-				<div class="recipe-detail-actions" id="detail-actions" hidden>
+				<div class="recipe-detail-actions" id="detail-actions">
 					<button type="button" class="btn-secondary" id="edit-recipe-btn">
 						Upravit
 					</button>
@@ -55,7 +55,7 @@
 			</section>
 		</main>
 
-		<div class="modal-backdrop" id="delete-modal" hidden>
+		<div class="modal-backdrop" id="delete-modal">
 			<div class="modal-card">
 				<h2 class="modal-title">Smazat recept?</h2>
 				<p class="modal-text">
@@ -118,12 +118,20 @@
 			const timeLabels = ["<15 min", "15–30 min", "30–60 min", ">1 h"];
 			let currentRecipe = null;
 
+			// Default: hide edit/delete actions and delete modal
+			if (actionsEl) {
+				actionsEl.style.display = "none";
+			}
+			if (deleteModal) {
+				deleteModal.style.display = "none";
+			}
+
 			function openDeleteModal() {
-				if (deleteModal) deleteModal.hidden = false;
+				if (deleteModal) deleteModal.style.display = "flex";
 			}
 
 			function closeDeleteModal() {
-				if (deleteModal) deleteModal.hidden = true;
+				if (deleteModal) deleteModal.style.display = "none";
 			}
 
 			function addTag(text) {
@@ -220,7 +228,7 @@
 					backLinkEl.href = "receptar.html";
 				}
 				if (actionsEl) {
-					actionsEl.hidden = false;
+					actionsEl.style.display = "flex";
 				}
 
 				if (editBtn) {
