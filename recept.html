@@ -94,7 +94,7 @@
 
 			const params = new URLSearchParams(window.location.search);
 			const id = params.get("id");
-			const from = params.get("from");
+			const cameFromReceptar = document.referrer.includes("receptar.html");
 			if (!id) {
 				alert("Chybí identifikátor receptu.");
 			}
@@ -215,7 +215,7 @@
 			}
 
 			// Pokud jsme přišli z Receptáře, povolit úpravy a mazání
-			if (from === "receptar") {
+			if (cameFromReceptar) {
 				if (backLinkEl) {
 					backLinkEl.href = "receptar.html";
 				}
