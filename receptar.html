@@ -46,25 +46,32 @@
 			</header>
 
 			<section class="recipe-shelf">
-				<a href="#" class="recipe-shelf-card">
+				<a href="#" class="recipe-shelf-card" data-meal="FULL MEAL">
 					<div class="recipe-shelf-icon" aria-hidden="true">🍲</div>
 					<div class="recipe-shelf-text">Full Meals</div>
 				</a>
 
-				<a href="#" class="recipe-shelf-card">
+				<a href="#" class="recipe-shelf-card" data-meal="SNÍDANĚ">
 					<div class="recipe-shelf-icon" aria-hidden="true">🍳</div>
 					<div class="recipe-shelf-text">Snídaně</div>
 				</a>
 
-				<a href="#" class="recipe-shelf-card">
+				<a href="#" class="recipe-shelf-card" data-meal="SNACK">
 					<div class="recipe-shelf-icon" aria-hidden="true">🍿</div>
 					<div class="recipe-shelf-text">Snacks</div>
 				</a>
 
-				<a href="#" class="recipe-shelf-card">
+				<a href="#" class="recipe-shelf-card" data-meal="DEZERT">
 					<div class="recipe-shelf-icon" aria-hidden="true">🧁</div>
 					<div class="recipe-shelf-text">Dezerty</div>
 				</a>
+			</section>
+
+			<section class="taste-section" id="shelf-results-section">
+				<p class="taste-label" id="shelf-results-heading">
+					Vyber kategorii nahoře pro zobrazení receptů.
+				</p>
+				<div id="shelf-results"></div>
 			</section>
 
 			<a
@@ -96,6 +103,141 @@
 			});
 			backdrop.addEventListener("click", (e) => {
 				if (e.target === backdrop) closeMenu();
+			});
+
+			// Recepty podle typu
+			const resultsContainer = document.getElementById("shelf-results");
+			const headingEl = document.getElementById("shelf-results-heading");
+			const shelfCards = document.querySelectorAll(".recipe-shelf-card");
+			const timeLabels = ["<15 min", "15–30 min", "30–60 min", ">1 h"];
+			let allRecipes = [];
+
+			function renderShelfRecipes(type, recipes) {
+				resultsContainer.innerHTML = "";
+
+				if (!recipes || !recipes.length) {
+					headingEl.textContent = `Žádné recepty pro kategorii ${type}.`;
+					return;
+				}
+
+				headingEl.textContent = `Recepty: ${type}`;
+
+				recipes.forEach((recipe) => {
+					const article = document.createElement("article");
+					article.className = "recipe-card";
+
+					let imageEl;
+					if (recipe.photo_url) {
+						imageEl = document.createElement("img");
+						imageEl.className = "recipe-card-photo";
+						imageEl.src = recipe.photo_url;
+						imageEl.alt = recipe.name || "Foto receptu";
+					} else {
+						imageEl = document.createElement("div");
+						imageEl.className = "recipe-image-placeholder";
+						imageEl.setAttribute("aria-hidden", "true");
+					}
+
+					const info = document.createElement("div");
+					info.className = "recipe-info";
+
+					const title = document.createElement("h2");
+					title.className = "recipe-title";
+					title.textContent = recipe.name || "Bez názvu";
+
+					const metaRow = document.createElement("div");
+					metaRow.className = "recipe-meta-row";
+
+					if (recipe.prep_time_bucket !== null && recipe.prep_time_bucket !== undefined) {
+						const span = document.createElement("span");
+						span.className = "recipe-tag";
+						const idx = Number(recipe.prep_time_bucket);
+						span.textContent = timeLabels[idx] ?? "";
+						metaRow.appendChild(span);
+					}
+
+					if (Array.isArray(recipe.vibes) && recipe.vibes.length) {
+						const span = document.createElement("span");
+						span.className = "recipe-tag";
+						span.textContent = recipe.vibes[0];
+						metaRow.appendChild(span);
+					}
+
+					info.appendChild(title);
+					info.appendChild(metaRow);
+
+					article.appendChild(imageEl);
+					article.appendChild(info);
+
+					if (recipe.id) {
+						article.addEventListener("click", () => {
+							window.location.href = `recept.html?id=${encodeURIComponent(
+								recipe.id
+							)}&from=receptar`;
+						});
+					}
+
+					resultsContainer.appendChild(article);
+				});
+			}
+
+			async function loadAllRecipes() {
+				if (allRecipes.length) return allRecipes;
+				try {
+					const { data, error } = await supabase
+						.from("recipes")
+						.select("*")
+						.order("created_at", { ascending: false });
+
+					if (error) {
+						console.error("Chyba při načítání receptů", error);
+						alert("Nepodařilo se načíst recepty.");
+						return [];
+					}
+
+					const withUrls = await Promise.all(
+						(data ?? []).map(async (recipe) => {
+							if (recipe.photo_path) {
+								try {
+									const { data: signed, error: signedError } =
+										await supabase.storage
+											.from("recipe-photos")
+											.createSignedUrl(recipe.photo_path, 60 * 60);
+									if (!signedError && signed?.signedUrl) {
+										recipe.photo_url = signed.signedUrl;
+									}
+								} catch (e) {
+									console.warn("Nepodařilo se vytvořit URL fotky", e);
+								}
+							}
+							return recipe;
+						})
+					);
+
+					allRecipes = withUrls;
+					return allRecipes;
+				} catch (err) {
+					console.error("Neočekávaná chyba při načítání receptů", err);
+					alert("Došlo k neočekávané chybě při načítání receptů.");
+					return [];
+				}
+			}
+
+			shelfCards.forEach((card) => {
+				card.addEventListener("click", async (e) => {
+					e.preventDefault();
+					const type = card.getAttribute("data-meal");
+					if (!type) return;
+
+					shelfCards.forEach((c) => c.classList.remove("app-menu-link-active"));
+					card.classList.add("app-menu-link-active");
+
+					const recipes = await loadAllRecipes();
+					const filtered = recipes.filter(
+						(r) => r.meal_type && r.meal_type.trim().toUpperCase() === type
+					);
+					renderShelfRecipes(type, filtered);
+				});
 			});
 		</script>
 	</body>

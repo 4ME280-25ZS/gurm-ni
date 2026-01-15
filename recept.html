@@ -15,7 +15,7 @@
 	<body class="app-body">
 		<main class="recipe-detail-page">
 			<header class="recipe-detail-header">
-				<a href="chutomer.html" class="recipe-back-link">Zpět</a>
+				<a href="chutomer.html" class="recipe-back-link" id="detail-back-link">Zpět</a>
 			</header>
 
 			<section class="recipe-detail-card">
@@ -43,6 +43,15 @@
 					<h2 class="recipe-detail-subheading">Postup:</h2>
 					<ol id="detail-steps" class="steps-list steps-list-detail"></ol>
 				</div>
+
+				<div class="recipe-detail-actions" id="detail-actions" hidden>
+					<button type="button" class="btn-secondary" id="edit-recipe-btn">
+						Upravit
+					</button>
+					<button type="button" class="btn-danger" id="delete-recipe-btn">
+						Smazat
+					</button>
+				</div>
 			</section>
 		</main>
 
@@ -60,6 +69,7 @@
 
 			const params = new URLSearchParams(window.location.search);
 			const id = params.get("id");
+			const from = params.get("from");
 			if (!id) {
 				alert("Chybí identifikátor receptu.");
 			}
@@ -72,8 +82,13 @@
 			const tagsEl = document.getElementById("detail-tags");
 			const ingredientsEl = document.getElementById("detail-ingredients");
 			const stepsEl = document.getElementById("detail-steps");
+			const actionsEl = document.getElementById("detail-actions");
+			const backLinkEl = document.getElementById("detail-back-link");
+			const editBtn = document.getElementById("edit-recipe-btn");
+			const deleteBtn = document.getElementById("delete-recipe-btn");
 
 			const timeLabels = ["<15 min", "15–30 min", "30–60 min", ">1 h"];
+			let currentRecipe = null;
 
 			function addTag(text) {
 				if (!text) return;
@@ -101,6 +116,7 @@
 						alert("Recept nebyl nalezen.");
 						return;
 					}
+					currentRecipe = recipe;
 
 					titleEl.textContent = recipe.name || "Recept";
 
@@ -160,6 +176,47 @@
 
 			if (id) {
 				loadRecipe();
+			}
+
+			// Pokud jsme přišli z Receptáře, povolit úpravy a mazání
+			if (from === "receptar") {
+				if (backLinkEl) {
+					backLinkEl.href = "receptar.html";
+				}
+				if (actionsEl) {
+					actionsEl.hidden = false;
+				}
+
+				if (editBtn) {
+					editBtn.addEventListener("click", () => {
+						window.location.href = `novy-recept.html?id=${encodeURIComponent(
+							id
+						)}`;
+					});
+				}
+
+				if (deleteBtn) {
+					deleteBtn.addEventListener("click", async () => {
+						if (!currentRecipe) return;
+						const confirmed = confirm(
+							"Opravdu chceš tento recept smazat? Tuto akci nelze vrátit."
+						);
+						if (!confirmed) return;
+
+						const { error } = await supabase
+							.from("recipes")
+							.delete()
+							.eq("id", id);
+
+						if (error) {
+							alert("Mazání receptu se nezdařilo: " + error.message);
+							return;
+						}
+
+						alert("Recept byl smazán.");
+						window.location.href = "receptar.html";
+					});
+				}
 			}
 		</script>
 	</body>

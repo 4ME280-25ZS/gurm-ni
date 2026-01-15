@@ -29,7 +29,6 @@
 								id="photo"
 								type="file"
 								accept="image/*"
-								capture="environment"
 								class="sr-only-input"
 							/>
 							<img
@@ -161,6 +160,8 @@
 			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
 
 			const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+			const params = new URLSearchParams(window.location.search);
+			const editingId = params.get("id");
 			const {
 				data: { session },
 			} = await supabase.auth.getSession();
@@ -173,6 +174,7 @@
 			const photoPreview = document.getElementById("photo-preview");
 			const photoDrop = document.querySelector(".recipe-photo-drop");
 			let photoFile = null;
+			let existingPhotoPath = null;
 			if (photoInput && photoPreview && photoDrop) {
 				photoInput.addEventListener("change", (e) => {
 					const file = e.target.files && e.target.files[0];
@@ -243,6 +245,149 @@
 			const firstStep = stepsList.querySelector(".step-input");
 			if (firstStep) attachStepHandler(firstStep);
 
+			// Pokud upravujeme existující recept, načíst data a předvyplnit formulář
+			if (editingId) {
+				const titleEl = document.querySelector(".recipe-form-title");
+				if (titleEl) titleEl.textContent = "Upravit Recept";
+				const submitBtn = document.querySelector(".recipe-submit-button");
+				if (submitBtn) submitBtn.textContent = "Uložit";
+
+				try {
+					const { data: recipe, error } = await supabase
+						.from("recipes")
+						.select("*")
+						.eq("id", editingId)
+						.single();
+
+					if (error) {
+						console.error("Chyba při načítání receptu", error);
+						alert("Nepodařilo se načíst recept pro úpravu.");
+					} else if (recipe) {
+						document.getElementById("recipe-name").value = recipe.name || "";
+
+						// Meal type
+						if (recipe.meal_type) {
+							const mealButtons = document.querySelectorAll(".meal-chip");
+							mealButtons.forEach((btn) => {
+								btn.classList.remove("meal-chip-active");
+								const label = btn.querySelector(".meal-label-main");
+								if (
+									label &&
+									label.textContent.trim().toUpperCase() ===
+										recipe.meal_type.trim().toUpperCase()
+								) {
+									btn.classList.add("meal-chip-active");
+								}
+							});
+						}
+
+						// Time
+						const timeSlider = document.querySelector(".time-slider");
+						if (
+							timeSlider &&
+							recipe.prep_time_bucket !== null &&
+							recipe.prep_time_bucket !== undefined
+						) {
+							timeSlider.value = String(recipe.prep_time_bucket);
+						}
+
+						// Dietary
+						if (Array.isArray(recipe.dietary)) {
+							const pills = document.querySelectorAll(".pill");
+							pills.forEach((pill) => {
+								const text = pill.textContent.trim().toUpperCase();
+								if (
+									recipe.dietary
+										.map((d) => String(d).trim().toUpperCase())
+										.includes(text)
+								) {
+									pill.classList.add("pill-on");
+								} else {
+									pill.classList.remove("pill-on");
+								}
+							});
+						}
+
+						// Vibes
+						if (Array.isArray(recipe.vibes)) {
+							const vibePills = document.querySelectorAll(".pill-icon");
+							vibePills.forEach((pill) => {
+								const text = pill.textContent.trim().toLowerCase();
+								if (
+									recipe.vibes
+										.map((v) => String(v).trim().toLowerCase())
+										.includes(text)
+								) {
+									pill.classList.add("pill-on");
+								} else {
+									pill.classList.remove("pill-on");
+								}
+							});
+						}
+
+						// Ingredients
+						ingredientList.innerHTML = "";
+						if (Array.isArray(recipe.ingredients)) {
+							recipe.ingredients.forEach((ing) => {
+								const li = document.createElement("li");
+								li.textContent = ing;
+								ingredientList.appendChild(li);
+							});
+						}
+
+						// Steps
+						stepsList.innerHTML = "";
+						if (Array.isArray(recipe.steps) && recipe.steps.length) {
+							recipe.steps.forEach((stepText, index) => {
+								const li = document.createElement("li");
+								li.className = "steps-item";
+								const ta = document.createElement("textarea");
+								ta.className = "step-input";
+								ta.rows = 1;
+								ta.value = stepText;
+								li.appendChild(ta);
+								stepsList.appendChild(li);
+								attachStepHandler(ta);
+							});
+						} else {
+							// aspoň jeden prázdný krok
+							const li = document.createElement("li");
+							li.className = "steps-item";
+							const ta = document.createElement("textarea");
+							ta.className = "step-input";
+							ta.rows = 1;
+							ta.placeholder =
+								"Napiš první krok a stiskni Enter pro další";
+							li.appendChild(ta);
+							stepsList.appendChild(li);
+							attachStepHandler(ta);
+						}
+
+						// Photo preview of existing image
+						if (recipe.photo_path && photoPreview && photoDrop) {
+							try {
+								const { data: signed, error: signedError } =
+									await supabase.storage
+										.from("recipe-photos")
+										.createSignedUrl(recipe.photo_path, 60 * 60);
+								if (!signedError && signed?.signedUrl) {
+									photoPreview.src = signed.signedUrl;
+									photoPreview.classList.remove("hidden");
+									photoDrop.classList.add("has-photo");
+								}
+							} catch (e) {
+								console.warn("Nepodařilo se načíst náhled fotky", e);
+							}
+						}
+
+						existingPhotoPath = recipe.photo_path || null;
+					}
+				} catch (err) {
+					console.error("Neočekávaná chyba při načítání receptu", err);
+					alert("Došlo k neočekávané chybě při načítání receptu pro úpravu.");
+				}
+			}
+
 			// Submit handler: save recipe to Supabase
 			const form = document.getElementById("recipe-form");
 			form.addEventListener("submit", async (e) => {
@@ -283,7 +428,7 @@
 					.map((t) => t.value.trim())
 					.filter(Boolean);
 
-				let photo_path = null;
+				let photo_path = existingPhotoPath;
 				if (photoFile) {
 					const ext = photoFile.name.split(".").pop() || "jpg";
 					const fileName = `${session.user.id}/${crypto.randomUUID()}.${ext}`;
@@ -298,25 +443,51 @@
 					}
 				}
 
-				const { error } = await supabase.from("recipes").insert({
-					user_id: session.user.id,
-					name,
-					meal_type,
-					prep_time_bucket,
-					dietary,
-					vibes,
-					ingredients,
-					steps,
-					photo_path,
-				});
+				if (editingId) {
+					const { error } = await supabase
+						.from("recipes")
+						.update({
+							name,
+							meal_type,
+							prep_time_bucket,
+							dietary,
+							vibes,
+							ingredients,
+							steps,
+							photo_path,
+						})
+						.eq("id", editingId);
 
-				if (error) {
-					alert("Ukládání receptu se nezdařilo: " + error.message);
-					return;
+					if (error) {
+						alert("Ukládání změn se nezdařilo: " + error.message);
+						return;
+					}
+
+					alert("Recept byl aktualizován.");
+					window.location.href = `recept.html?id=${encodeURIComponent(
+						editingId
+					)}&from=receptar`;
+				} else {
+					const { error } = await supabase.from("recipes").insert({
+						user_id: session.user.id,
+						name,
+						meal_type,
+						prep_time_bucket,
+						dietary,
+						vibes,
+						ingredients,
+						steps,
+						photo_path,
+					});
+
+					if (error) {
+						alert("Ukládání receptu se nezdařilo: " + error.message);
+						return;
+					}
+
+					alert("Recept byl uložen.");
+					window.location.href = "receptar.html";
 				}
-
-				alert("Recept byl uložen.");
-				window.location.href = "receptar.html";
 			});
 		</script>
 	</body>
