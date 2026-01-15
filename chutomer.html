@@ -123,18 +123,8 @@
 				<button type="button" class="btn-primary-wide">HLEDEJ RECEPT</button>
 			</section>
 
-			<section class="taste-section">
-				<article class="recipe-card">
-					<div class="recipe-image-placeholder" aria-hidden="true"></div>
-					<div class="recipe-info">
-						<h2 class="recipe-title">Špagety aglio e olio</h2>
-						<div class="recipe-meta-row">
-							<span class="recipe-tag">Lehká</span>
-							<span class="recipe-tag">15 min</span>
-							<span class="recipe-tag">2 porce</span>
-						</div>
-					</div>
-				</article>
+			<section class="taste-section" id="results-section">
+				<div id="results"></div>
 			</section>
 		</main>
 
@@ -176,6 +166,123 @@
 			backdrop.addEventListener("click", (e) => {
 				if (e.target === backdrop) closeMenu();
 			});
+
+			// Načtení a zobrazení receptů aktuálního uživatele
+			const resultsContainer = document.getElementById("results");
+			const searchButton = document.querySelector(".btn-primary-wide");
+			const surpriseButton = document.querySelector(".btn-secondary");
+
+			const timeLabels = ["<15 min", "15–30 min", "30–60 min", ">1 h"];
+
+			function renderRecipes(recipes) {
+				resultsContainer.innerHTML = "";
+
+				if (!recipes || recipes.length === 0) {
+					const empty = document.createElement("p");
+					empty.className = "taste-label";
+					empty.textContent = "Zatím tu nejsou žádné recepty. Přidej nový v Receptáři.";
+					resultsContainer.appendChild(empty);
+					return;
+				}
+
+				recipes.forEach((recipe) => {
+					const article = document.createElement("article");
+					article.className = "recipe-card";
+
+					const imgPlaceholder = document.createElement("div");
+					imgPlaceholder.className = "recipe-image-placeholder";
+					imgPlaceholder.setAttribute("aria-hidden", "true");
+
+					const info = document.createElement("div");
+					info.className = "recipe-info";
+
+					const title = document.createElement("h2");
+					title.className = "recipe-title";
+					title.textContent = recipe.name || "Bez názvu";
+
+					const metaRow = document.createElement("div");
+					metaRow.className = "recipe-meta-row";
+
+					if (recipe.meal_type) {
+						const span = document.createElement("span");
+						span.className = "recipe-tag";
+						span.textContent = recipe.meal_type;
+						metaRow.appendChild(span);
+					}
+
+					if (recipe.prep_time_bucket !== null && recipe.prep_time_bucket !== undefined) {
+						const span = document.createElement("span");
+						span.className = "recipe-tag";
+						const idx = Number(recipe.prep_time_bucket);
+						span.textContent = timeLabels[idx] ?? "";
+						metaRow.appendChild(span);
+					}
+
+					if (Array.isArray(recipe.vibes) && recipe.vibes.length > 0) {
+						const span = document.createElement("span");
+						span.className = "recipe-tag";
+						span.textContent = recipe.vibes[0];
+						metaRow.appendChild(span);
+					}
+
+					info.appendChild(title);
+					info.appendChild(metaRow);
+
+					article.appendChild(imgPlaceholder);
+					article.appendChild(info);
+
+					resultsContainer.appendChild(article);
+				});
+			}
+
+			async function fetchRecipes() {
+				try {
+					const { data, error } = await supabase
+						.from("recipes")
+						.select("*")
+						.order("created_at", { ascending: false });
+
+					if (error) {
+						console.error("Chyba při načítání receptů", error);
+						alert("Nepodařilo se načíst recepty.");
+						return [];
+					}
+
+					return data ?? [];
+				} catch (err) {
+					console.error("Neočekávaná chyba při načítání receptů", err);
+					alert("Došlo k neočekávané chybě při načítání receptů.");
+					return [];
+				}
+			}
+
+			async function loadAllRecipes() {
+				const recipes = await fetchRecipes();
+				renderRecipes(recipes);
+			}
+
+			// Hledat – pro teď prostě načte všechny recepty uživatele
+			if (searchButton) {
+				searchButton.addEventListener("click", () => {
+					loadAllRecipes();
+				});
+			}
+
+			// Překvap mě – náhodný recept z uživatelových receptů
+			if (surpriseButton) {
+				surpriseButton.addEventListener("click", async () => {
+					const recipes = await fetchRecipes();
+					if (!recipes.length) {
+						renderRecipes([]);
+						return;
+					}
+					const random = recipes[Math.floor(Math.random() * recipes.length)];
+					renderRecipes([random]);
+				});
+			}
+
+			// Načteme všechny recepty hned po načtení stránky
+			loadAllRecipes();
 		</script>
 	</body>
 </html>
