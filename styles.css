@@ -651,6 +651,11 @@ body.app-body {
 	z-index: 40;
 }
 
+.modal-backdrop[hidden],
+.recipe-detail-actions[hidden] {
+	display: none !important;
+}
+
 .modal-card {
 	width: 90%;
 	max-width: 360px;
