@@ -55,6 +55,31 @@
 			</section>
 		</main>
 
+		<div class="modal-backdrop" id="delete-modal" hidden>
+			<div class="modal-card">
+				<h2 class="modal-title">Smazat recept?</h2>
+				<p class="modal-text">
+					Opravdu chceš tento recept smazat? Tuto akci nelze vrátit.
+				</p>
+				<div class="modal-actions">
+					<button
+						type="button"
+						class="btn-secondary"
+						id="cancel-delete-btn"
+					>
+						Ne, zpět
+					</button>
+					<button
+						type="button"
+						class="btn-danger"
+						id="confirm-delete-btn"
+					>
+						Smazat
+					</button>
+				</div>
+			</div>
+		</div>
+
 		<script type="module">
 			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 			import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
@@ -86,9 +111,20 @@
 			const backLinkEl = document.getElementById("detail-back-link");
 			const editBtn = document.getElementById("edit-recipe-btn");
 			const deleteBtn = document.getElementById("delete-recipe-btn");
+			const deleteModal = document.getElementById("delete-modal");
+			const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
+			const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
 
 			const timeLabels = ["<15 min", "15–30 min", "30–60 min", ">1 h"];
 			let currentRecipe = null;
+
+			function openDeleteModal() {
+				if (deleteModal) deleteModal.hidden = false;
+			}
+
+			function closeDeleteModal() {
+				if (deleteModal) deleteModal.hidden = true;
+			}
 
 			function addTag(text) {
 				if (!text) return;
@@ -196,27 +232,44 @@
 				}
 
 				if (deleteBtn) {
-					deleteBtn.addEventListener("click", async () => {
+					deleteBtn.addEventListener("click", () => {
 						if (!currentRecipe) return;
-						const confirmed = confirm(
-							"Opravdu chceš tento recept smazat? Tuto akci nelze vrátit."
-						);
-						if (!confirmed) return;
-
-						const { error } = await supabase
-							.from("recipes")
-							.delete()
-							.eq("id", id);
-
-						if (error) {
-							alert("Mazání receptu se nezdařilo: " + error.message);
-							return;
-						}
-
-						alert("Recept byl smazán.");
-						window.location.href = "receptar.html";
+						openDeleteModal();
 					});
 				}
+			}
+
+			if (deleteModal) {
+				deleteModal.addEventListener("click", (e) => {
+					if (e.target === deleteModal) {
+						closeDeleteModal();
+					}
+				});
+			}
+
+			if (cancelDeleteBtn) {
+				cancelDeleteBtn.addEventListener("click", () => {
+					closeDeleteModal();
+				});
+			}
+
+			if (confirmDeleteBtn) {
+				confirmDeleteBtn.addEventListener("click", async () => {
+					if (!currentRecipe) return;
+
+					const { error } = await supabase
+						.from("recipes")
+						.delete()
+						.eq("id", id);
+
+					if (error) {
+						alert("Mazání receptu se nezdařilo: " + error.message);
+						return;
+					}
+
+					closeDeleteModal();
+					window.location.href = "receptar.html";
+				});
 			}
 		</script>
 	</body>

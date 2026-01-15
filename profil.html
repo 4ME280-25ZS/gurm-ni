@@ -47,6 +47,11 @@
 
 			<section class="taste-section">
 				<p class="taste-label">Zde bude stránka profilu uživatele.</p>
+				<div class="profile-section-card">
+					<button type="button" class="logout-button" id="logout-button">
+						Odhlásit
+					</button>
+				</div>
 			</section>
 		</main>
 
@@ -71,6 +76,14 @@
 			backdrop.addEventListener("click", (e) => {
 				if (e.target === backdrop) closeMenu();
 			});
+
+			const logoutButton = document.getElementById("logout-button");
+			if (logoutButton) {
+				logoutButton.addEventListener("click", async () => {
+					await supabase.auth.signOut();
+					window.location.href = "index.html";
+				});
+			}
 		</script>
 	</body>
 </html>
