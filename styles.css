@@ -321,17 +321,26 @@ body.app-body {
 	font-size: 0.95rem;
 }
 
-.recipe-add-button {
+.recipe-add-wrapper {
 	position: fixed;
+	left: 0;
+	right: 0;
 	bottom: 1.6rem;
-	right: calc(50% - 180px);
-	width: 42px;
-	height: 42px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 30;
+}
+
+.recipe-add-button {
+	width: 44px;
+	height: 44px;
 	border-radius: 999px;
 	border: none;
 	background-color: #2f3e32;
 	color: #ffffff;
-	font-size: 1.5rem;
+	font-size: 1.7rem;
 	line-height: 1;
 	display: flex;
 	align-items: center;
@@ -342,14 +351,17 @@ body.app-body {
 }
 
 .recipe-add-icon {
-	font-size: 1.4rem;
+	font-size: 1.5rem;
 }
 
-.recipe-add-label {
-	margin-left: 0.4rem;
-	font-size: 0.8rem;
-	letter-spacing: 0.08em;
+.recipe-add-text {
+	margin-top: 0.3rem;
+	font-size: 0.78rem;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
+	color: #2f3e32;
+	font-family: "Cherry Bomb One", system-ui, -apple-system,
+		BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .recipe-form-page {
@@ -1207,6 +1219,17 @@ body.app-body {
 .logout-button:hover {
 	background-color: #991b1b;
 	box-shadow: 0 14px 30px rgba(127, 29, 29, 0.7);
+}
+
+@media (min-width: 768px) {
+	.login-page,
+	.taste-page,
+	.recipe-form-page,
+	.recipe-detail-page {
+		max-width: 520px;
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+	}
 }
 
 /* Potraviny page */
