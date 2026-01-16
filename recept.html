@@ -268,7 +268,8 @@
 					const { error } = await supabase
 						.from("recipes")
 						.delete()
-						.eq("id", id);
+						.eq("id", id)
+						.eq("user_id", session.user.id);
 
 					if (error) {
 						alert("Mazání receptu se nezdařilo: " + error.message);
