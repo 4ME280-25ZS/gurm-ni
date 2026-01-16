@@ -1226,9 +1226,9 @@ body.app-body {
 	.taste-page,
 	.recipe-form-page,
 	.recipe-detail-page {
-		max-width: 520px;
-		padding-left: 1.5rem;
-		padding-right: 1.5rem;
+		max-width: 900px;
+		padding-left: 2.5rem;
+		padding-right: 2.5rem;
 	}
 }
 
