@@ -265,14 +265,19 @@
 				confirmDeleteBtn.addEventListener("click", async () => {
 					if (!currentRecipe) return;
 
-					const { error } = await supabase
+					const { data, error } = await supabase
 						.from("recipes")
 						.delete()
 						.eq("id", id)
-						.eq("user_id", session.user.id);
+						.select("id");
 
 					if (error) {
 						alert("Mazání receptu se nezdařilo: " + error.message);
+						return;
+					}
+
+					if (!data || !data.length) {
+						alert("Recept se nepodařilo smazat. Zkus to prosím znovu.");
 						return;
 					}
 
